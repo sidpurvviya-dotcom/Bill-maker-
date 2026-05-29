@@ -1,0 +1,493 @@
+﻿<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bill Maker - बिल बनाएं</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style id="dynamicTemplatesCss"></style>
+  <!-- Local Authentication Mode -->
+</head>
+<body>
+
+  <!-- Auth loading screen (shown while checking login state) -->
+  <div id="authOverlay" style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
+    <div style="font-size:48px">📄</div>
+    <div style="font-size:18px;font-weight:700;color:#1d4ed8">Bill Maker</div>
+    <div style="width:36px;height:36px;border:3px solid #bfdbfe;border-top-color:#1d4ed8;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+    <div style="font-size:13px;color:#6b7280">लोगिन जाँच हो रही है...</div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+  </div>
+
+  <!-- ===== TOP HEADER ===== -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="app-logo">📄</div>
+      <div>
+        <div class="app-title">Bill Maker</div>
+        <div class="app-subtitle">बिल / चालान बनाएं</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <!-- User info (hidden until logged in) -->
+      <div class="user-info" id="userInfo" style="display:none">
+        <div id="userAvatarPlaceholder" style="width: 32px; height: 32px; border-radius: 50%; background: #bfdbfe; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-right: 8px;">👤</div>
+        <img class="user-avatar" id="userAvatar" src="" alt="" style="display:none">
+        <div class="user-details">
+          <div class="user-name" id="userName"></div>
+          <div class="user-email" id="userEmail"></div>
+        </div>
+      </div>
+      <!-- Back to Dashboard -->
+      <a href="dashboard.html" class="btn-dashboard" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">📁 Saved Bills</a>
+      <a href="profile.html" class="btn-dashboard" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">⚙️ Profile Settings</a>
+      <button class="btn-print" id="btnPrint">
+        🖨️ Print / प्रिंट करें
+      </button>
+      <button class="btn-new" id="btnNewBill">
+        ➕ New Bill
+      </button>
+      <button class="btn-logout" id="btnLogout" style="display:none" title="Logout">
+        🚪 Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="app-layout">
+
+    <!-- LEFT PANEL: FORM -->
+    <div class="form-panel">
+
+      <!-- TAB BUTTONS -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab-bill">📋 Bill Info</button>
+        <button class="tab-btn" data-tab="tab-items">🛒 Items / सामान</button>
+        <button class="tab-btn" data-tab="tab-charges">💰 Charges</button>
+        <button class="tab-btn" data-tab="tab-history">📁 इतिहास (History)</button>
+        <button class="tab-btn" data-tab="tab-settings">⚙️ Settings</button>
+        <button class="tab-btn" data-tab="tab-templates">🎨 Templates</button>
+      </div>
+
+      <!-- ─── TAB 1: BILL INFO ─── -->
+      <div class="tab-content active" id="tab-bill">
+
+        <div class="section-card">
+          <div class="section-title">🏪 दुकान / व्यापार की जानकारी <small>(आपकी दुकान)</small></div>
+          <div class="field-group">
+            <label>दुकान का नाम <span class="req">*</span></label>
+            <input type="text" id="profBusinessName" placeholder="जैसे: S.V.K.B. किराना स्टोर">
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>मोबाइल नंबर</label>
+              <input type="tel" id="profPhone" placeholder="9876543210">
+            </div>
+            <div class="field-group">
+              <label>GSTIN (वैकल्पिक)</label>
+              <input type="text" id="profGSTIN" placeholder="09AAAAA0000A1Z5">
+            </div>
+          </div>
+          <div class="field-group">
+            <label>पता</label>
+            <input type="text" id="profAddress" placeholder="जैसे: गल्ला मंडी, गोरखपुर">
+          </div>
+          <div class="field-group">
+            <label>शीर्षक (ऊपर छपेगा)</label>
+            <input type="text" id="profReligiousHeader" placeholder="जैसे: || श्री गणेशाय नमः ||">
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">🧾 बिल की जानकारी</div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>बिल नंबर</label>
+              <input type="text" id="metaInvoiceNo" placeholder="जैसे: 105">
+            </div>
+            <div class="field-group">
+              <label>दिनांक</label>
+              <input type="date" id="metaDate">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>बिल का प्रकार</label>
+            <div class="toggle-group">
+              <label class="toggle-opt">
+                <input type="radio" name="billType" value="estimate" checked>
+                <span>📋 Estimate / पक्का बिल</span>
+              </label>
+              <label class="toggle-opt">
+                <input type="radio" name="billType" value="challan">
+                <span>🚚 Challan / चालान</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>कागज़ का साइज़</label>
+              <select id="layoutPageSize">
+                <option value="A4">A4 (पूरा पेज)</option>
+                <option value="A5-Portrait">A4/2 (आधा पेज / A5)</option>
+                <option value="A5-Landscape">A5 आड़ा (Landscape)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>गाड़ी / रूट (वैकल्पिक)</label>
+              <input type="text" id="metaVehicleInfo" placeholder="जैसे: रामकुमार 407">
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">👤 खरीदार की जानकारी</div>
+          <div class="field-group">
+            <label>दुकान / ग्राहक का नाम <span class="req">*</span></label>
+            <input type="text" id="metaReceiverName" placeholder="जैसे: प्रिया किराना स्टोर, देवरी">
+          </div>
+          <div class="field-group">
+            <label>पता</label>
+            <input type="text" id="metaReceiverAddress" placeholder="जैसे: देवरी चौराहा, गोरखपुर">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── TAB 2: ITEMS ─── -->
+      <div class="tab-content" id="tab-items">
+        <div class="section-card no-pad">
+          <div class="items-toolbar">
+            <span class="section-title" style="margin:0">🛒 सामान की सूची</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn-add" id="btnAddRow">+ जोड़ें</button>
+              <button class="btn-clear" id="btnClearItems">🗑️ सब हटाएं</button>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <div class="items-scroll">
+            <table class="items-ctrl-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>सामान का नाम (Item Name)</th>
+                  <th>मात्रा (Qty)</th>
+                  <th>यूनिट (Unit)</th>
+                  <th>दर / रेट (₹)</th>
+                  <th>छूट (Discount)</th>
+                  <th>राशि (Amount)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="itemsBody">
+                <!-- rows here -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="overflow-alert" id="overflowAlert" style="display:none">
+            ⚠️ बहुत सारे items हैं — print करने पर अगले page पर जा सकते हैं।
+          </div>
+        </div>
+
+        <!-- Live subtotal bar -->
+        <div class="live-total-bar">
+          <span>कुल योग:</span>
+          <strong id="liveSubtotal">₹ 0.00</strong>
+        </div>
+      </div>
+
+      <!-- ─── TAB 3: CHARGES ─── -->
+      <div class="tab-content" id="tab-charges">
+        <div class="section-card">
+          <div class="section-title">➕ अतिरिक्त खर्च</div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>&#x928;&#x917; (Nag) &mdash; &#x915;&#x93F;&#x924;&#x928;&#x947; &#x928;&#x917;?</label>
+              <input type="number" id="calcHammaliNag" min="0" value="0" placeholder="10" step="1" oninput="S.charges.hammaliNag=parseFloat(this.value)||0;recalcAndUpdate()">
+            </div>
+            <div class="field-group">
+              <label>&#x20B9; &#x92A;&#x94D;&#x930;&#x924;&#x93F; &#x928;&#x917; (Rate/Nag)</label>
+              <input type="number" id="calcHammaliRate" min="0" value="0" placeholder="5" step="0.5" oninput="S.charges.hammaliRate=parseFloat(this.value)||0;recalcAndUpdate()">
+            </div>
+          </div>
+          <div id="hammaliFormula" style="margin:6px 0 10px;padding:8px 14px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #f59e0b;border-radius:8px;font-size:13px;font-weight:700;color:#92400e;display:none">
+            <span id="hammaliFormulaText">0 nag &times; &#x20B9;0 = &#x20B9;0</span>
+            <span style="margin-left:8px;font-size:10px;font-weight:400;color:#78350f">(&#x915;&#x941;&#x932; &#x92E;&#x947;&#x902; &#x91C;&#x941;&#x921;&#x93C;&#x947;&#x917;&#x93E;)</span>
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>&#x92C;&#x94B;&#x930;&#x93E; / &#x92C;&#x94B;&#x930;&#x940; &#x91A;&#x93E;&#x930;&#x94D;&#x91C; (&#x20B9;)</label>
+              <input type="number" id="calcBori" min="0" value="0" placeholder="0">
+            </div>
+            <div class="field-group"></div>
+          </div>
+          <input type="hidden" id="calcHammali" value="0">
+          <div class="field-row">
+            <div class="field-group">
+              <label>GST (%)</label>
+              <select id="calcTaxGST">
+                <option value="0">कोई नहीं (0%)</option>
+                <option value="5">GST 5%</option>
+                <option value="12">GST 12%</option>
+                <option value="18">GST 18%</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>अग्रिम / जमा (₹)</label>
+              <input type="number" id="calcAdvance" min="0" value="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary card -->
+        <div class="summary-card">
+          <div class="summary-title">📊 हिसाब का सारांश</div>
+          <div class="summary-row"><span>सामान का योग</span><span id="sumSubtotal">₹ 0.00</span></div>
+          <div class="summary-row" id="sumBoriRow"><span>बोरा चार्ज</span><span id="sumBori">₹ 0.00</span></div>
+          <div class="summary-row" id="sumGstRow"><span>GST (<span id="sumGstPct">0</span>%)</span><span id="sumGst">₹ 0.00</span></div>
+          <div class="summary-row text-red" id="sumAdvanceRow"><span>(-) अग्रिम</span><span id="sumAdvance">₹ 0.00</span></div>
+          <div class="summary-divider"></div>
+          <div class="summary-row grand"><span>कुल देय राशि</span><span id="sumNet">₹ 0.00</span></div>
+          <!-- Hammali shown separately as note -->
+          <div class="summary-row" id="sumHammaliRow" style="color:#d97706;font-weight:600">
+            <span>&#x2696;&#xFE0F; &#x939;&#x92E;&#x94D;&#x92E;&#x93E;&#x932;&#x940; (<span id="sumHammaliNag">0</span> nag &times; &#x20B9;<span id="sumHammaliRateDisplay">0</span>)</span>
+            <span id="sumHammali">&#x20B9; 0.00</span>
+          </div>
+        </div>
+
+        <div class="section-card" style="margin-top:16px">
+          <div class="section-title">📝 शर्तें व नियम</div>
+          <div class="field-group">
+            <textarea id="profTerms" rows="3" placeholder="जैसे: पेमेंट 20 दिन में करें। इसके बाद 2% ब्याज लगेगा।"></textarea>
+          </div>
+        </div>
+
+        <div class="action-btns">
+          <button class="btn-export" id="btnExport">💾 Save (JSON)</button>
+          <button class="btn-import" id="btnImport">📂 Load (JSON)</button>
+          <input type="file" id="importFile" accept=".json" style="display:none">
+        </div>
+      </div>
+
+      <!-- ─── TAB 4: BILL HISTORY ─── -->
+      <div class="tab-content" id="tab-history">
+        <div class="section-card" style="padding:0;overflow:hidden">
+          <div class="items-toolbar">
+            <span class="section-title" style="margin:0">📁 सहेजे गए बिल (Saved Bills)</span>
+            <button class="btn-add" id="btnRefreshHistory" style="background:#6b7280">🔄 अपडेट</button>
+          </div>
+          <!-- Search by shop name -->
+          <div style="padding:10px 16px;border-bottom:1px solid #f0f0f0">
+            <input type="text" id="historySearch" placeholder="🔍 दुकान का नाम से ढूंढें..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px">
+          </div>
+          <!-- Records list -->
+          <div id="historyList" style="max-height:500px;overflow-y:auto;padding:8px 0">
+            <div class="history-empty" id="historyEmpty">
+              <div style="text-align:center;padding:40px 20px;color:#9ca3af">
+                <div style="font-size:40px;margin-bottom:12px">📂</div>
+                <div style="font-weight:600;margin-bottom:6px">अभी कोई बिल सेव नहीं हुआ</div>
+                <div style="font-size:12px">Print करने पर बिल अतओमैटिक सेव होगा</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- ─── TAB 5: SETTINGS ─── -->
+      <div class="tab-content" id="tab-settings">
+        <div class="section-card">
+          <div class="section-title">⚙️ Application Settings</div>
+          <p class="help-text">यहाँ से आप अपना प्रोफाइल सेट करें। यह हर बार auto-load होगा।</p>
+          <div class="field-group" style="margin-top:14px">
+            <label>अगले बिल का नंबर</label>
+            <input type="number" id="settingNextNo" placeholder="1">
+          </div>
+          <div class="field-group">
+            <label>Auto-increment bill number?</label>
+            <div class="toggle-group">
+              <label class="toggle-opt">
+                <input type="radio" name="autoIncr" value="yes" checked>
+                <span>✅ हाँ (Auto)</span>
+              </label>
+              <label class="toggle-opt">
+                <input type="radio" name="autoIncr" value="no">
+                <span>❌ नहीं (Manual)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="danger-zone">
+          <button class="btn-danger" id="btnReset">🗑️ सब Reset करें (Clear All Data)</button>
+          <p class="help-text">⚠️ इससे सारा डेटा मिट जाएगा।</p>
+        </div>
+      </div>
+
+      <!-- ─── TAB 6: TEMPLATES ─── -->
+      <div class="tab-content" id="tab-templates">
+        <div class="section-card">
+          <div class="section-title">🎨 बिल टेम्पलेट चुनें</div>
+          <p class="help-text" style="margin-bottom:12px">VYAPAR जैसे template चुनें — प्रिंट में भी यही design आएगी।</p>
+
+          <div class="template-grid" id="templateGrid"></div>
+        </div>
+      </div>
+    </div><!-- end form-panel -->
+    <!-- RIGHT PANEL: LIVE PRINT PREVIEW -->
+    <div class="preview-panel">
+      <div class="preview-label">
+        <span class="live-dot"></span>
+        Live Preview — <span id="previewSizeLabel">A4</span>
+      </div>
+
+      <!-- THE ACTUAL BILL PAPER -->
+      <div class="bill-paper size-a4" id="invoicePaper">
+
+        <!-- Religious header -->
+        <div class="bill-religious" id="pReligious">|| श्री गणेशाय नमः ||</div>
+
+        <!-- Business header -->
+        <div class="bill-header-block">
+          <div class="bill-biz-left">
+            <div class="bill-biz-name" id="pBizName">S.V.K.B. किराना स्टोर</div>
+            <div class="bill-biz-sub" id="pBizSub">Wholesale Kirana Merchants</div>
+            <div class="bill-biz-addr" id="pBizAddr">गल्ला मंडी, गोरखपुर</div>
+          </div>
+          <div class="bill-biz-right">
+            <div id="pPhoneBlock"><strong>📞</strong> <span id="pPhone">9876543210</span></div>
+            <div id="pGstBlock"><strong>GST:</strong> <span id="pGST">09AAAAA0000A1Z5</span></div>
+          </div>
+        </div>
+
+        <div class="bill-line-thick"></div>
+        <div class="bill-doc-type" id="pDocType">— ESTIMATE / अनुमानित बिल —</div>
+        <div class="bill-line"></div>
+
+        <!-- Receiver + bill meta -->
+        <div class="bill-meta-grid">
+          <div class="bill-receiver">
+            <div class="meta-line">
+              <span class="mlabel">नाम:</span>
+              <span class="mval bold" id="pRecvName">प्रिया किराना स्टोर</span>
+            </div>
+            <div class="meta-line">
+              <span class="mlabel">पता:</span>
+              <span class="mval" id="pRecvAddr">देवरी चौराहा, गोरखपुर</span>
+            </div>
+            <div class="meta-line" id="pVehicleRow">
+              <span class="mlabel">गाड़ी:</span>
+              <span class="mval" id="pVehicle">रामकुमार 407</span>
+            </div>
+          </div>
+          <div class="bill-billno">
+            <div class="meta-line">
+              <span class="mlabel" id="pBillNoLabel">बिल नं:</span>
+              <span class="mval bold" id="pInvoiceNo">105</span>
+            </div>
+            <div class="meta-line">
+              <span class="mlabel">दिनांक:</span>
+              <span class="mval" id="pDate">28/05/2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bill-line"></div>
+
+        <!-- Items table -->
+        <table class="bill-items-table" id="pItemsTable">
+          <thead>
+            <tr>
+              <th class="tc" style="width:30px">क्र.</th>
+              <th>सामान का विवरण (Item)</th>
+              <th class="tr" style="width:80px">मात्रा (Qty)</th>
+              <th class="tr" id="thRate" style="width:80px">दर (Rate)</th>
+              <th class="tr" id="thDisc" style="width:60px">छूट (Disc.)</th>
+              <th class="tr" id="thAmt" style="width:90px">राशि (Amount)</th>
+            </tr>
+          </thead>
+          <tbody id="pItemsBody">
+          </tbody>
+        </table>
+
+        <!-- Totals + Signature -->
+        <div class="bill-footer-grid" id="pTotalsBlock">
+          <div class="bill-footer-left">
+            <div class="bill-terms-title">शर्तें व नियम:</div>
+            <div class="bill-terms-text" id="pTerms">पेमेंट 20 दिन में करें।</div>
+            <div class="bill-sign-row">
+              <div class="sign-box">
+                <div class="sign-line"></div>
+                <div class="sign-name">खरीदार के हस्ताक्षर</div>
+              </div>
+              <div class="sign-box">
+                <div class="sign-line"></div>
+                <div class="sign-name">कृते: <span id="pBizSignName">S.V.K.B.</span></div>
+                <div class="sign-sub">अधिकृत हस्ताक्षर</div>
+              </div>
+            </div>
+          </div>
+          <div class="bill-footer-right">
+            <table class="bill-totals-tbl">
+              <tr>
+                <td class="tl">उप योग (Subtotal)</td>
+                <td class="tr" id="pSubtotal">₹ 0.00</td>
+              </tr>
+              <tr id="pBoriRow">
+                <td class="tl">बोरा चार्ज</td>
+                <td class="tr" id="pBori">₹ 0.00</td>
+              </tr>
+              <tr id="pGstRow">
+                <td class="tl">GST (<span id="pGstPct">0</span>%)</td>
+                <td class="tr" id="pGst">₹ 0.00</td>
+              </tr>
+              <tr id="pAdvanceRow">
+                <td class="tl red">(-) अग्रिम</td>
+                <td class="tr red" id="pAdvance">₹ 0.00</td>
+              </tr>
+              <tr id="pHammaliRow">
+                <td class="tl" style="color:#b45309;font-weight:600">&#x2696;&#xFE0F; &#x939;&#x92E;&#x94D;&#x92E;&#x93E;&#x932;&#x940; <small>(<span id="pHammaliNag">0</span> nag &times; &#x20B9;<span id="pHammaliRate">0</span>)</small></td>
+                <td class="tr" id="pHammali" style="color:#b45309;font-weight:700">&#x20B9; 0.00</td>
+              </tr>
+              <tr class="grand-row">
+                <td class="tl">कुल देय राशि (Net Payable)</td>
+                <td class="tr bold" id="pNetTotal">₹ 0.00</td>
+              </tr>
+              <!-- Hammali shown BELOW grand total as an informational note -->
+              
+            </table>
+          </div>
+        </div>
+
+        <!-- Thank you footer -->
+        <div class="bill-thankyou">
+          ✦ धन्यवाद ! पुनः पधारें ✦
+        </div>
+
+      </div><!-- end bill-paper -->
+    </div><!-- end preview-panel -->
+
+  </div><!-- end app-layout -->
+
+  <!-- Toast notification -->
+  <div id="editorToast" style="
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:#1d4ed8; color:#fff; padding:12px 24px; border-radius:30px;
+    font-size:13px; font-weight:600; z-index:9999;
+    transition:transform 0.3s ease; box-shadow:0 4px 16px rgba(0,0,0,0.2);
+    pointer-events:none;
+  "></div>
+  <style>
+    #editorToast.show { transform: translateX(-50%) translateY(0) !important; }
+  </style>
+
+  <script src="app.js"></script>
+</body>
+</html>

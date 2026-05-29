@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile Settings — Bill Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #f0f4f8;
+      --bg-card: #ffffff;
+      --border-color: #e5e7eb;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --accent-primary: #1d4ed8;
+      --accent-primary-hover: #1e40af;
+      --accent-success: #10b981;
+      --accent-secondary: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+      background: var(--bg-dark);
+      min-height: 100vh;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── AUTH LOADING OVERLAY ── */
+    #authOverlay {
+      position: fixed; inset: 0;
+      background: #fff;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999; gap: 16px;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #bfdbfe;
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: #fff;
+      border-bottom: 2px solid var(--border-color);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky; top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-logo  { font-size: 28px; }
+    .nav-title { font-size: 20px; font-weight: 700; color: var(--accent-primary); font-family: 'Outfit', sans-serif; }
+    .nav-sub   { font-size: 12px; color: var(--text-muted); }
+    .nav-right { display: flex; align-items: center; gap: 15px; }
+
+    .nav-links { display: flex; gap: 10px; }
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-btn:hover { background: #f3f4f6; }
+    .nav-btn.active {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: var(--accent-primary);
+    }
+
+    .btn-logout {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { background: #fecaca; }
+
+    /* ── MAIN CONTAINER ── */
+    .main {
+      max-width: 650px;
+      margin: 40px auto 60px;
+      width: 100%;
+      padding: 0 20px;
+    }
+
+    .profile-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 35px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+    }
+
+    .profile-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 8px;
+    }
+
+    .profile-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+
+    /* ── FORM ── */
+    .form-group {
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .form-control {
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: #111;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    }
+
+    /* Toggle Group */
+    .toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .toggle-opt { position: relative; cursor: pointer; }
+    .toggle-opt input { position: absolute; opacity: 0; width: 0; }
+    .toggle-opt span {
+      display: block;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      background: #f9fafb;
+    }
+    .toggle-opt input:checked + span {
+      border-color: var(--accent-primary);
+      background: #eff6ff;
+      color: var(--accent-primary);
+      font-weight: 700;
+    }
+
+    .btn-save {
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+      color: #fff;
+      border: none;
+      padding: 13px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+      margin-top: 10px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .btn-save:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(29, 78, 216, 0.35);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent-primary);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- Auth loading overlay -->
+  <div id="authOverlay">
+    <div class="spinner"></div>
+    <div style="font-size:13px;color:#6b7280">सुरक्षित सत्र जांचा जा रहा है... (Checking Secure Session)</div>
+  </div>
+
+  <!-- TOP NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">📄</div>
+      <div>
+        <div class="nav-title">Bill Maker</div>
+        <div class="nav-sub">Dynamic SaaS Workspace</div>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-btn">📁 Saved Bills</a>
+        <a href="index.html" class="nav-btn">📋 Workspace</a>
+        <a href="profile.html" class="nav-btn active">⚙️ Profile Settings</a>
+      </div>
+      <button class="btn-logout" id="btnLogout">🚪 Logout</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONFIGURATION CARD -->
+  <main class="main">
+    <div class="profile-card">
+      <div class="profile-title">दुकान / प्रोफाइल सेटिंग्स (Profile Settings)</div>
+      <div class="profile-subtitle">अपनी दुकान की स्थाई जानकारी सेट करें। ये सेटिंग्स आपके चालान/बिल के प्रारूप (Format) में अपने आप लोड हो जाएंगी।</div>
+
+      <form id="profileForm" onsubmit="handleProfileSave(event)">
+        <div class="form-group">
+          <label>दुकान / व्यापार का नाम (Business Name) *</label>
+          <input type="text" class="form-control" id="profName" placeholder="जैसे: S.V.K.B. किराना स्टोर" required>
+        </div>
+
+        <div class="form-group">
+          <label>शीर्षक (Religious Top Header)</label>
+          <input type="text" class="form-control" id="profHeader" placeholder="जैसे: || श्री गणेशाय नमः || या || Jai Mata Di ||">
+        </div>
+
+        <div class="form-group font-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-group" style="margin-bottom:0">
+            <label>मोबाइल नंबर (Contact Number)</label>
+            <input type="tel" class="form-control" id="profPhone" placeholder="जैसे: 9876543210">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label>GSTIN (GST नंबर - वैकल्पिक)</label>
+            <input type="text" class="form-control" id="profGST" placeholder="E.g., 09AAAAA0000A1Z5">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>दुकान का पता (Business Address)</label>
+          <input type="text" class="form-control" id="profAddress" placeholder="जैसे: गल्ला मंडी, गोरखपुर, UP">
+        </div>
+
+        <div class="form-group">
+          <label>नियम और शर्तें (Default Footer Terms)</label>
+          <textarea class="form-control" id="profTerms" rows="3" placeholder="जैसे: बिका हुआ माल वापस नहीं होगा। भुगतान 20 दिन में करें।"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>डिफ़ॉल्ट प्रिंट साइज़ (Default Printing Layout)</label>
+          <div class="toggle-group">
+            <label class="toggle-opt">
+              <input type="radio" name="pageSize" value="A4" checked>
+              <span>A4 (पूरा पेज)</span>
+            </label>
+            <label class="toggle-opt">
+              <input type="radio" name="pageSize" value="A4/2">
+              <span>A4/2 (आधा पेज / A5)</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-save">सेटिंग्स सुरक्षित करें (Save Profile)</button>
+      </form>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    let CURRENT_USER = null;
+    let LOCAL_USERS = [];
+
+    // ── Local Auth Guard ──
+    (function initAuth() {
+      const activeSession = localStorage.getItem('bm_current_session');
+      if (!activeSession) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        CURRENT_USER = JSON.parse(activeSession);
+        if (!CURRENT_USER || CURRENT_USER.role !== 'user') {
+          throw new Error('Invalid user session');
+        }
+      } catch (err) {
+        console.warn('Auth session validation error:', err);
+        localStorage.removeItem('bm_current_session');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Check suspension state in local DB
+      try {
+        const usersData = localStorage.getItem('bm_local_users');
+        if (usersData) {
+          const parsed = JSON.parse(usersData);
+          if (Array.isArray(parsed)) {
+            LOCAL_USERS = parsed;
+            const u = LOCAL_USERS.find(usr => (usr.email || usr.userId || '').toLowerCase() === CURRENT_USER.email.toLowerCase());
+            if (u && u.subscriptionState && u.subscriptionState !== 'active') {
+              alert('❌ आपका खाता निलंबित (Suspended) या समाप्त हो चुका है। कृपया एडमिन से संपर्क करें।');
+              localStorage.removeItem('bm_current_session');
+              window.location.href = 'login.html';
+              return;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Subscription guard validation error:', err);
+      }
+
+      // Hide overlay
+      const overlay = document.getElementById('authOverlay');
+      if (overlay) overlay.style.display = 'none';
+
+      prefillProfileForm();
+    })();
+
+    // ── Pre-fill form from database registry ──
+    function prefillProfileForm() {
+      const u = LOCAL_USERS.find(usr => (usr.email || usr.userId || '').toLowerCase() === CURRENT_USER.email.toLowerCase());
+      if (u) {
+        document.getElementById('profName').value = u.shopName || '';
+        document.getElementById('profHeader').value = u.billingPreferences?.religiousHeader || '';
+        document.getElementById('profPhone').value = u.billingPreferences?.phone || '';
+        document.getElementById('profGST').value = u.billingPreferences?.gstin || '';
+        document.getElementById('profAddress').value = u.billingPreferences?.address || '';
+        document.getElementById('profTerms').value = u.billingPreferences?.terms || '';
+
+        const size = u.billingPreferences?.pageSize || 'A4';
+        const radio = document.querySelector(`input[name="pageSize"][value="${size}"]`);
+        if (radio) radio.checked = true;
+      }
+    }
+
+    // ── Save changes back to bm_local_users and local profiles ──
+    function handleProfileSave(e) {
+      e.preventDefault();
+
+      const shopName = document.getElementById('profName').value.trim();
+      const religiousHeader = document.getElementById('profHeader').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      const gstin = document.getElementById('profGST').value.trim();
+      const address = document.getElementById('profAddress').value.trim();
+      const terms = document.getElementById('profTerms').value.trim();
+      const pageSize = document.querySelector('input[name="pageSize"]:checked').value;
+
+      // Update registry document
+      const idx = LOCAL_USERS.findIndex(usr => (usr.email || usr.userId || '').toLowerCase() === CURRENT_USER.email.toLowerCase());
+      if (idx !== -1) {
+        LOCAL_USERS[idx].shopName = shopName;
+        LOCAL_USERS[idx].billingPreferences = {
+          pageSize: pageSize,
+          autoIncrement: LOCAL_USERS[idx].billingPreferences?.autoIncrement !== undefined ? LOCAL_USERS[idx].billingPreferences.autoIncrement : true,
+          religiousHeader: religiousHeader,
+          phone: phone,
+          gstin: gstin,
+          address: address,
+          terms: terms
+        };
+
+        if (!LOCAL_USERS[idx].stats) {
+          LOCAL_USERS[idx].stats = { lastLogin: null, lastActive: null, sessionCount: 0, totalBills: 0 };
+        }
+        LOCAL_USERS[idx].stats.lastActive = new Date().toISOString();
+
+        // Save to central local storage database
+        localStorage.setItem('bm_local_users', JSON.stringify(LOCAL_USERS));
+
+        // Save to compatibility storage profile keys
+        localStorage.setItem('bm_profile', JSON.stringify({
+          religiousHeader: religiousHeader,
+          businessName: shopName,
+          phone: phone,
+          gstin: gstin,
+          address: address,
+          terms: terms
+        }));
+
+        localStorage.setItem('bm_bill_config', JSON.stringify({
+          pageSize: pageSize === 'A4/2' ? 'A5-Portrait' : 'A4', // Compatibility bridge to editor page size key
+          autoIncrement: LOCAL_USERS[idx].billingPreferences.autoIncrement
+        }));
+
+        showToast('✅ सेटिंग्स सफलतापूर्वक सुरक्षित हो गई!');
+      } else {
+        alert('❌ User profile not found in database.');
+      }
+    }
+
+    // Logout
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      if (confirm('Logout करना चाहते हैं?')) {
+        localStorage.removeItem('bm_current_session');
+        window.location.href = 'login.html';
+      }
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+  </script>
+</body>
+</html>

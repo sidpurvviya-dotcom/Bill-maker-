@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Sign Up — Bill Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Configuration and local assets -->
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 40%, #2563eb 70%, #3b82f6 100%);
+      padding: 20px;
+    }
+
+    /* Animated background blobs */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 30%, rgba(99,102,241,0.3) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 70%, rgba(16,185,129,0.2) 0%, transparent 50%);
+      animation: blobMove 8s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes blobMove {
+      0%   { transform: translate(0,0) rotate(0deg); }
+      100% { transform: translate(30px, 20px) rotate(5deg); }
+    }
+
+    /* ── Card ── */
+    .login-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+      text-align: center;
+      position: relative;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Logo / App icon ── */
+    .app-icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 20px rgba(29, 78, 216, 0.35);
+    }
+
+    .app-name {
+      font-size: 26px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .app-tagline {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 24px;
+      font-family: 'Noto Sans Devanagari', sans-serif;
+    }
+
+    /* ── Auth Tabs ── */
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .auth-tab-btn.active {
+      color: #1d4ed8;
+      border-bottom: 3px solid #1d4ed8;
+      font-weight: 700;
+    }
+
+    /* ── Auth Forms ── */
+    .auth-form {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .field-group input {
+      border: 1.5px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #111;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    .field-group input:focus {
+      border-color: #1d4ed8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 13px 20px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+      margin-top: 8px;
+      font-family: inherit;
+    }
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(29, 78, 216, 0.4);
+    }
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+    .btn-register {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-register:hover {
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+    }
+    .req {
+      color: #ef4444;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 16px;
+    }
+    .divider-line { flex: 1; height: 1px; background: #e5e7eb; }
+    .divider-text { font-size: 12px; color: #9ca3af; font-weight: 500; }
+
+    /* Google Button Wrapper */
+    #googleBtnContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+    }
+
+    /* ── Status message ── */
+    .status-msg {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .status-msg.error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      display: block;
+    }
+    .status-msg.success {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      display: block;
+    }
+
+    /* ── Setup notice ── */
+    .setup-notice {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: left;
+      margin-top: 14px;
+    }
+    .setup-notice h3 { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 6px; }
+    .setup-notice ol { font-size: 12px; color: #78350f; padding-left: 16px; line-height: 1.8; }
+    .setup-notice a  { color: #1d4ed8; font-weight: 600; text-decoration: none; }
+
+    /* Info note */
+    .info-note {
+      margin-top: 24px;
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <!-- App branding -->
+    <div class="app-icon">📄</div>
+    <div class="app-name">Bill Maker</div>
+    <div class="app-tagline">बिल / इनवॉइस / चालान बनाएं — आसानी से</div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+      <div class="field-group">
+        <label>यूज़रनेम / ईमेल (Username / Email) <span class="req">*</span></label>
+        <input type="text" id="loginEmail" placeholder="उदाहरण: rahul या example@gmail.com" required autocomplete="username">
+      </div>
+      <div class="field-group">
+        <label>पासवर्ड (Password) <span class="req">*</span></label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-submit">लॉगिन करें (Sign In)</button>
+    </form>
+
+    <!-- Status message -->
+    <div class="status-msg" id="statusMsg"></div>
+
+    <div class="info-note">
+      🔒 आपका डेटा आपके इसी ब्राउज़र (`localStorage`) में सुरक्षित रूप से सेव किया जाता है।
+    </div>
+  </div>
+
+  <script>
+    // Check if user is already logged in
+    window.addEventListener('DOMContentLoaded', () => {
+      const activeSession = localStorage.getItem('bm_current_session');
+      if (activeSession) {
+        try {
+          const session = JSON.parse(activeSession);
+          if (session && session.role === 'admin') {
+            window.location.href = 'admin.html';
+            return;
+          }
+        } catch (e) {}
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    const statusEl = document.getElementById('statusMsg');
+
+    function showStatus(msg, type = 'error') {
+      statusEl.textContent = msg;
+      statusEl.className = 'status-msg ' + type;
+    }
+
+    function clearStatus() {
+      statusEl.className = 'status-msg';
+      statusEl.style.display = 'none';
+    }
+
+    // Status message handlers
+
+    // ── Local DB helpers ──
+    function getLocalUsers() {
+      const data = localStorage.getItem('bm_local_users');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveLocalUsers(users) {
+      localStorage.setItem('bm_local_users', JSON.stringify(users));
+    }
+
+    // Fallback pure-JS SHA-256 implementation for insecure/file contexts
+    function sha256Fallback(ascii) {
+      function rightRotate(value, amount) {
+        return (value >>> amount) | (value << (32 - amount));
+      }
+      var mathPow = Math.pow;
+      var maxWord = mathPow(2, 32);
+      var i, j;
+      var result = '';
+      var words = [];
+      var asciiLength = ascii.length;
+      var hash = [];
+      var k = [];
+      var primeCounter = 0;
+      var isComposite = {};
+      for (var candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (i = 0; i < 313; i += candidate) {
+            isComposite[i] = candidate;
+          }
+          hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while (ascii.length % 64 - 56) ascii += '\x00';
+      for (i = 0; i < ascii.length; i++) {
+        j = ascii.charCodeAt(i);
+        if (j >> 8) return '';
+        words[i >> 2] |= j << ((3 - i % 4) * 8);
+      }
+      words[words.length] = ((asciiLength / maxWord) | 0);
+      words[words.length] = (asciiLength << 3);
+      for (j = 0; j < words.length; j += 16) {
+        var w = words.slice(j, j + 16);
+        var oldHash = hash;
+        hash = hash.slice(0, 8);
+        for (i = 0; i < 64; i++) {
+          var w15 = w[i - 15], w2 = w[i - 2];
+          var s0 = rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3);
+          var s1 = rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10);
+          w[i] = (i >= 16) ? (w[i - 16] + s0 + w[i - 7] + s1) | 0 : w[i];
+          var ch = (hash[4] & hash[5]) ^ (~hash[4] & hash[6]);
+          var maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+          var temp1 = hash[7] + (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) + ch + k[i] + w[i];
+          var temp2 = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) + maj;
+          hash = [(temp1 + temp2) | 0].concat(hash);
+          hash[4] = (hash[4] + temp1) | 0;
+        }
+        for (i = 0; i < 8; i++) {
+          hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+      }
+      for (i = 0; i < 8; i++) {
+        var v = hash[i];
+        if (v < 0) v += maxWord;
+        var str = v.toString(16);
+        while (str.length < 8) str = '0' + str;
+        result += str;
+      }
+      return result;
+    }
+
+    // Hashing helper (supports Web Crypto with JS fallback)
+    async function hashPassword(password) {
+      if (!window.crypto || !window.crypto.subtle) {
+        console.warn('Web Crypto API not available. Using pure JS SHA-256 fallback.');
+        return sha256Fallback(password);
+      }
+      try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (err) {
+        console.warn('SubtleCrypto digest failed, falling back to JS implementation:', err);
+        return sha256Fallback(password);
+      }
+    }
+
+    // Handle login
+    async function handleLogin(e) {
+      e.preventDefault();
+      clearStatus();
+
+      try {
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const password = document.getElementById('loginPassword').value;
+
+        const passwordHash = await hashPassword(password);
+
+        // ── ROUTE A: Super Admin Authentication ──
+        if (email === 'sidpurvviya@gmail.com' && password === 'Siddhant@16') {
+          // Initialize admin configuration in localStorage if it doesn't exist
+          let adminConfig = localStorage.getItem('bm_admin_config');
+          if (!adminConfig) {
+            const adminObj = {
+              masterId: 'sidpurvviya@gmail.com',
+              masterPasswordHash: passwordHash,
+              adminEmail: 'sidpurvviya@gmail.com',
+              businessName: 'Super Admin Group',
+              gmailClientId: '',
+              gmailClientSecret: '',
+              gmailRefreshToken: '',
+              managedUsers: []
+            };
+            localStorage.setItem('bm_admin_config', JSON.stringify(adminObj));
+          }
+
+          // Create Admin Session simulating a JWT token
+          const dummyToken = btoa(JSON.stringify({ email: 'sidpurvviya@gmail.com', role: 'admin', exp: Date.now() + 86400000 }));
+          localStorage.setItem('bm_current_session', JSON.stringify({
+            email: 'sidpurvviya@gmail.com',
+            shopName: 'Super Admin',
+            role: 'admin',
+            token: dummyToken,
+            authProvider: 'local'
+          }));
+
+          showStatus('✅ Admin login successful! Opening control panel...', 'success');
+          setTimeout(() => {
+            window.location.href = 'admin.html';
+          }, 800);
+          return;
+        }
+
+        // ── ROUTE B: Sub-User Authentication ──
+        const users = getLocalUsers();
+        
+        // Find matching user (handles legacy plain text passwords as fallback)
+        let matchedUser = null;
+        let needsMigration = false;
+
+        for (let u of users) {
+          // Match by username, userId, or email (all normalised to lowercase)
+          const uId = (u.username || u.userId || u.email || '').toLowerCase();
+          if (uId === email) {
+            if (u.passwordHash) {
+              if (u.passwordHash === passwordHash) {
+                matchedUser = u;
+              }
+            } else if (u.password === password) {
+              // Legacy plain password matched -> mark for hash migration
+              matchedUser = u;
+              needsMigration = true;
+            }
+            break;
+          }
+        }
+
+        if (!matchedUser) {
+          showStatus('❌ यूज़रनेम / ईमेल या पासवर्ड सही नहीं है।', 'error');
+          return;
+        }
+
+        // Check subscription state
+        if (matchedUser.subscriptionState && matchedUser.subscriptionState !== 'active') {
+          showStatus(`❌ आपका खाता निलंबित (Suspended) या समाप्त हो चुका है। वर्तमान स्थिति: ${matchedUser.subscriptionState.toUpperCase()}। कृपया एडमिन से संपर्क करें।`, 'error');
+          return;
+        }
+
+        // Perform plain-text to SHA-256 hash migration if needed
+        if (needsMigration) {
+          matchedUser.passwordHash = passwordHash;
+          delete matchedUser.password;
+        }
+
+        // Initialize/Update stats
+        if (!matchedUser.stats) {
+          matchedUser.stats = { lastLogin: null, lastActive: null, sessionCount: 0, totalBills: 0 };
+        }
+        matchedUser.stats.lastLogin = new Date().toISOString();
+        matchedUser.stats.sessionCount = (matchedUser.stats.sessionCount || 0) + 1;
+        
+        // Ensure billingPreferences are initialized
+        if (!matchedUser.billingPreferences) {
+          matchedUser.billingPreferences = {
+            pageSize: 'A4',
+            autoIncrement: true
+          };
+        }
+
+        // Save changes back to database
+        saveLocalUsers(users);
+
+        // Create simulated JWT token for sub-user
+        const sessionId = matchedUser.username || matchedUser.email || matchedUser.userId;
+        const matchedRole = matchedUser.role || 'user';
+        const userToken = btoa(JSON.stringify({ email: sessionId, role: matchedRole, exp: Date.now() + 86400000 }));
+        localStorage.setItem('bm_current_session', JSON.stringify({
+          email: sessionId,
+          shopName: matchedUser.shopName,
+          role: matchedRole,
+          token: userToken,
+          authProvider: 'local'
+        }));
+
+        showStatus('✅ लॉगिन सफल! डैशबोर्ड खुल रहा है...', 'success');
+
+        setTimeout(() => {
+          window.location.href = matchedRole === 'admin' ? 'admin.html' : 'dashboard.html';
+        }, 800);
+      } catch (err) {
+        console.error('Login error details:', err);
+        showStatus('❌ लॉगिन के दौरान त्रुटि: ' + err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

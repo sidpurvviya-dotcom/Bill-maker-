@@ -1,0 +1,1477 @@
+/* ===========================
+   BILL MAKER — Simplified UI
+   =========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+  background: #f0f2f5;
+  color: #1a1a1a;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── TOP HEADER ── */
+.app-header {
+  background: #fff;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+.app-logo { font-size: 32px; }
+.app-title { font-size: 20px; font-weight: 700; color: #1d4ed8; }
+.app-subtitle { font-size: 12px; color: #6b7280; margin-top: 1px; }
+
+.header-right { display: flex; gap: 10px; align-items: center; }
+
+.btn-print {
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-print:hover { background: #1e40af; }
+
+.btn-new {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-new:hover { background: #e5e7eb; }
+
+.btn-dashboard {
+  background: #f0f4ff;
+  color: #1d4ed8;
+  border: 1.5px solid #bfdbfe;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-dashboard:hover { background: #dbeafe; }
+
+
+/* ── User Info (top-right when logged in) ── */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #bfdbfe;
+}
+.user-details { text-align: left; }
+.user-name  { font-size: 13px; font-weight: 700; color: #111; line-height: 1.2; }
+.user-email { font-size: 10px; color: #6b7280; }
+
+.btn-logout {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-logout:hover { background: #fecaca; }
+
+/* ── MAIN LAYOUT ── */
+.app-layout {
+  display: grid;
+  grid-template-columns: 520px 1fr;
+  height: calc(100vh - 65px);
+  overflow: hidden;
+}
+
+/* ── LEFT FORM PANEL ── */
+.form-panel {
+  background: #fff;
+  border-right: 2px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  background: #f8fafc;
+  border-bottom: 2px solid #e5e7eb;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover { background: #f0f2f5; color: #374151; }
+.tab-btn.active { color: #1d4ed8; border-bottom-color: #1d4ed8; background: #fff; font-weight: 700; }
+
+/* ── TAB CONTENT ── */
+.tab-content { display: none; flex: 1; overflow-y: auto; padding: 16px; flex-direction: column; gap: 14px; }
+.tab-content.active { display: flex; }
+
+/* Custom scrollbar */
+.tab-content::-webkit-scrollbar { width: 5px; }
+.tab-content::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+/* ── CARDS ── */
+.section-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.section-card.no-pad { padding: 0; overflow: hidden; }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title small { font-weight: 400; color: #9ca3af; font-size: 11px; }
+
+.req { color: #ef4444; }
+.help-text { font-size: 12px; color: #9ca3af; line-height: 1.5; }
+
+/* ── FORM FIELDS ── */
+.field-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.field-group:last-child { margin-bottom: 0; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+select,
+textarea {
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #111;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+}
+
+textarea { resize: vertical; }
+
+/* ── TOGGLE GROUP ── */
+.toggle-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.toggle-opt { position: relative; cursor: pointer; }
+.toggle-opt input { position: absolute; opacity: 0; width: 0; }
+.toggle-opt span {
+  display: block;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s;
+  background: #f9fafb;
+}
+.toggle-opt input:checked + span {
+  border-color: #1d4ed8;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+/* ── ITEMS TOOLBAR ── */
+.items-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.btn-add {
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-add:hover { background: #1e40af; }
+
+.btn-clear {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-clear:hover { background: #fecaca; }
+
+/* Quick chips */
+.chips-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  background: #fffbeb;
+}
+.chips-label { font-size: 11px; font-weight: 600; color: #92400e; white-space: nowrap; }
+.chips-list { display: flex; gap: 6px; flex-wrap: nowrap; }
+.chip {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip:hover { background: #fde68a; }
+
+/* ── ITEMS CONTROL TABLE ── */
+.items-scroll { overflow-x: auto; }
+.items-ctrl-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 600px; }
+.items-ctrl-table th {
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  padding: 8px 6px;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+.items-ctrl-table td { padding: 5px 4px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.items-ctrl-table input {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 5px !important;
+  padding: 5px 6px !important;
+  font-size: 12px !important;
+  height: 30px;
+  background: #fff;
+  width: 100%;
+}
+.items-ctrl-table input:focus { border-color: #1d4ed8 !important; box-shadow: none !important; }
+.items-ctrl-table .row-amount { font-weight: 700; color: #1d4ed8; padding: 5px 8px; white-space: nowrap; }
+
+.btn-del-row {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+.btn-del-row:hover { color: #ef4444; background: #fee2e2; }
+
+/* Live total bar */
+.live-total-bar {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #1e40af;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.live-total-bar strong { font-size: 20px; }
+
+/* Overflow alert */
+.overflow-alert {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  font-size: 12px;
+  padding: 8px 14px;
+  margin: 8px 16px;
+  border-radius: 7px;
+}
+
+/* ── SUMMARY CARD ── */
+.summary-card {
+  border: 2px solid #1d4ed8;
+  border-radius: 12px;
+  padding: 16px;
+  background: #eff6ff;
+}
+.summary-title { font-size: 13px; font-weight: 700; color: #1e3a8a; margin-bottom: 12px; }
+.summary-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px dashed #bfdbfe; }
+.summary-row:last-child { border-bottom: none; }
+.summary-row.text-red span { color: #b91c1c; }
+.summary-divider { border-top: 2px solid #1d4ed8; margin: 8px 0; }
+.summary-row.grand { font-size: 16px; font-weight: 700; color: #1e3a8a; }
+
+/* ── ACTION BUTTONS ── */
+.action-btns { display: flex; gap: 10px; margin-top: 4px; }
+.btn-export, .btn-import {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid #d1d5db;
+  background: #f9fafb;
+  color: #374151;
+  transition: all 0.2s;
+}
+.btn-export:hover, .btn-import:hover { background: #e5e7eb; }
+
+/* Danger zone */
+.danger-zone {
+  border: 1.5px dashed #fca5a5;
+  border-radius: 10px;
+  padding: 16px;
+  background: #fff5f5;
+  text-align: center;
+}
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.btn-danger:hover { background: #dc2626; }
+
+/* ── RIGHT PREVIEW PANEL ── */
+.preview-panel {
+  background: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+  gap: 12px;
+}
+
+.preview-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  align-self: flex-start;
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulse 1.8s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── THE BILL PAPER ── */
+.bill-paper {
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  font-family: 'Noto Sans Devanagari', 'Inter', serif;
+  color: #111;
+  transition: all 0.3s ease;
+}
+
+.size-a4       { width: 794px; min-height: 1122px; padding: 36px 40px; }
+.size-a5-p     { width: 560px; min-height: 794px;  padding: 24px 28px; }
+.size-a5-l     { width: 794px; min-height: 560px;  padding: 20px 28px; font-size: 12px; }
+
+/* Bill paper internal components */
+.bill-religious {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.bill-header-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bill-biz-left { flex: 1; }
+.bill-biz-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: #000;
+  line-height: 1.15;
+  font-family: 'Noto Sans Devanagari', serif;
+}
+.bill-biz-sub  { font-size: 12px; color: #555; margin-top: 2px; }
+.bill-biz-addr { font-size: 11px; color: #777; margin-top: 2px; }
+
+.bill-biz-right {
+  text-align: right;
+  font-size: 12px;
+  color: #333;
+  line-height: 1.8;
+  white-space: nowrap;
+}
+
+.bill-line-thick { height: 3px; background: #111; margin: 10px 0 4px; }
+.bill-line { height: 1px; background: #333; margin: 6px 0; }
+
+.bill-doc-type {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #111;
+  padding: 2px 0;
+}
+
+/* Receiver + Bill No */
+.bill-meta-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 12px;
+}
+.meta-line {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+.mlabel { font-weight: 700; color: #555; min-width: 55px; font-size: 11px; }
+.mval { color: #111; }
+.mval.bold { font-weight: 700; font-size: 13px; color: #000; }
+
+/* Items Table */
+.bill-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 10px 0;
+}
+.bill-items-table th {
+  border-top: 1.5px solid #111;
+  border-bottom: 1.5px solid #111;
+  padding: 7px 5px;
+  font-weight: 700;
+  background: #f5f5f5;
+  color: #000;
+}
+.bill-items-table td {
+  padding: 6px 5px;
+  border-bottom: 1px solid #ddd;
+  color: #222;
+}
+.bill-items-table tr:last-child td { border-bottom: 1.5px solid #111; }
+.bill-items-table .tr { text-align: right; }
+.bill-items-table .tc { text-align: center; }
+.bill-items-table .amt-cell { font-weight: 700; }
+
+/* Footer: Terms + Totals */
+.bill-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 20px;
+  margin-top: 14px;
+  align-items: start;
+}
+
+.bill-terms-title { font-size: 11px; font-weight: 700; color: #333; margin-bottom: 3px; }
+.bill-terms-text  { font-size: 11px; color: #555; line-height: 1.5; white-space: pre-line; }
+
+.bill-sign-row { display: flex; gap: 20px; margin-top: 24px; }
+.sign-box { flex: 1; text-align: center; }
+.sign-line { border-bottom: 1px dashed #aaa; margin-top: 30px; margin-bottom: 5px; }
+.sign-name { font-size: 11px; font-weight: 600; color: #333; }
+.sign-sub  { font-size: 10px; color: #777; }
+
+/* Totals table */
+.bill-totals-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.bill-totals-tbl td { padding: 5px 6px; }
+.bill-totals-tbl .tl { color: #555; font-weight: 500; }
+.bill-totals-tbl .tr { text-align: right; font-weight: 600; }
+.bill-totals-tbl .red { color: #c00; }
+.bill-totals-tbl .bold { font-weight: 700; }
+.grand-row td { border-top: 2px double #111; border-bottom: 2px double #111; padding: 8px 6px; background: #f5f5f5; font-size: 14px; font-weight: 700; }
+
+.bill-thankyou {
+  text-align: center;
+  font-size: 12px;
+  color: #555;
+  margin-top: 18px;
+  letter-spacing: 1px;
+  font-weight: 500;
+  border-top: 1px dashed #ccc;
+  padding-top: 10px;
+}
+
+/* Hammali note row — shown below grand total, not part of net */
+.hammali-note-row td {
+  border-top: 1px dashed #ccc !important;
+  padding: 6px 5px !important;
+  font-size: 11px;
+  color: #7c6a00;
+  font-style: italic;
+  background: #fffbeb;
+}
+
+/* Hammali note in sidebar summary */
+.summary-row.hammali-note {
+  border-top: 1px dashed #d1a800 !important;
+  margin-top: 4px;
+  padding-top: 6px;
+  font-size: 12px;
+  color: #7c6a00;
+  font-style: italic;
+}
+.summary-row.hammali-note small {
+  font-size: 10px;
+  color: #a0870f;
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+  body { background: #fff; }
+  .app-header, .form-panel, .preview-label { display: none !important; }
+  .app-layout { display: block !important; height: auto; }
+  .preview-panel {
+    background: none !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+  .bill-paper {
+    box-shadow: none !important;
+    margin: 0 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+  }
+  .size-a4 { width: 210mm !important; min-height: 297mm !important; padding: 12mm 14mm !important; }
+  .size-a5-p { width: 148mm !important; min-height: 210mm !important; padding: 10mm 12mm !important; }
+  .size-a5-l { width: 210mm !important; min-height: 148mm !important; padding: 8mm 10mm !important; }
+  tr { page-break-inside: avoid; }
+
+  /* Template print padding fixes — full-width headers need to bleed to paper edges */
+  #invoicePaper.tmpl-vyapar .bill-header-block,
+  #invoicePaper.tmpl-credit .bill-header-block,
+  #invoicePaper.tmpl-dark .bill-header-block,
+  #invoicePaper.tmpl-green .bill-header-block { padding: 10px 14mm !important; }
+
+  #invoicePaper.tmpl-vyapar .bill-religious,
+  #invoicePaper.tmpl-credit .bill-religious,
+  #invoicePaper.tmpl-dark .bill-religious,
+  #invoicePaper.tmpl-green .bill-religious { padding: 6px 14mm !important; }
+}
+
+/* ── Bill History Cards ── */
+.history-bill-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.history-bill-card:hover { background: #f0f9ff; }
+.history-bill-card:last-child { border-bottom: none; }
+
+.hbc-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.hbc-info { flex: 1; min-width: 0; }
+.hbc-shop {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hbc-meta {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.hbc-amount {
+  text-align: right;
+  flex-shrink: 0;
+}
+.hbc-amt-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+.hbc-date {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 1px;
+}
+
+.history-group-header {
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: #f8fafc;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE SELECTOR UI
+═══════════════════════════════════════════════════════ */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+.tmpl-card {
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: #fff;
+}
+.tmpl-card:hover {
+  border-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(29,78,216,0.15);
+}
+.tmpl-card.tmpl-active {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(29,78,216,0.18);
+}
+.tmpl-card.tmpl-active::after {
+  content: '\2713';
+  position: absolute;
+  top: 4px; right: 5px;
+  background: #1d4ed8;
+  color: white;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  font-size: 9px; font-weight: 900;
+  line-height: 16px; text-align: center;
+}
+.tmpl-preview {
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tmpl-preview-head {
+  padding: 5px 7px 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+.tmpl-preview-body {
+  flex: 1;
+  padding: 4px 7px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.tp-line  { height: 2px; border-radius: 1px; background: #ccc; }
+.tp-line.w100 { width:100%; }
+.tp-line.w70  { width:70%; }
+.tp-line.w50  { width:50%; }
+.tp-line.w35  { width:35%; }
+.tp-line.thick { height: 3px; }
+.tp-table { width:100%; border-top:1.5px solid #ccc; border-bottom:1.5px solid #ccc; padding:2px 0; display:flex; flex-direction:column; gap:2px; }
+.tp-tr { display:flex; gap:3px; }
+.tp-td { height:2px; border-radius:1px; background:#e0e0e0; flex:1; }
+.tmpl-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: #374151;
+  text-align: center;
+  padding: 4px 3px 3px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  line-height: 1.2;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 1 — VYAPAR CLASSIC (Scales + Grey Bar)
+   Based on top-left invoice in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-1 {
+  background: #fff;
+  border: 1px solid #ccc;
+}
+#invoicePaper.tmpl-1 .bill-religious {
+  background: #e0e0e0;
+  color: #333;
+  font-size: 11px;
+  padding: 5px 12px;
+  margin-bottom: 0;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #bbb;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#invoicePaper.tmpl-1 .bill-header-block {
+  padding: 10px 0 8px;
+  border-bottom: 2px solid #555;
+}
+#invoicePaper.tmpl-1 .bill-biz-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: 0.3px;
+}
+#invoicePaper.tmpl-1 .bill-biz-sub  { color: #444; font-size: 11px; }
+#invoicePaper.tmpl-1 .bill-biz-addr { color: #666; font-size: 11px; }
+#invoicePaper.tmpl-1 .bill-biz-right { color: #333; font-size: 11px; }
+#invoicePaper.tmpl-1 .bill-line-thick {
+  background: #444;
+  height: 2px;
+  margin: 4px 0 2px;
+}
+#invoicePaper.tmpl-1 .bill-line { background: #888; height: 1px; }
+#invoicePaper.tmpl-1 .bill-doc-type {
+  color: #333;
+  letter-spacing: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-1 .bill-items-table th {
+  background: #e8e8e8;
+  color: #111;
+  border-top: 2px solid #444;
+  border-bottom: 2px solid #444;
+  font-size: 11px;
+  padding: 5px 5px;
+}
+#invoicePaper.tmpl-1 .bill-items-table td { color: #222; font-size: 12px; }
+#invoicePaper.tmpl-1 .grand-row td {
+  background: #e8e8e8;
+  color: #111;
+  border-top: 2px solid #444;
+  border-bottom: 2px solid #444;
+}
+#invoicePaper.tmpl-1 .bill-thankyou {
+  border-top: 1px dashed #999;
+  color: #555;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 2 — SIMPLE RECEIPT (Minimal notepad style)
+   Based on top-right small receipt in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-2 {
+  background: #fff;
+  border: 1px solid #ddd;
+  font-size: 11px;
+}
+#invoicePaper.tmpl-2 .bill-religious {
+  display: none;
+}
+#invoicePaper.tmpl-2 .bill-header-block {
+  border-bottom: 1px solid #111;
+  padding: 4px 0 8px;
+}
+#invoicePaper.tmpl-2 .bill-biz-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+}
+#invoicePaper.tmpl-2 .bill-biz-sub  { font-size: 10px; color: #555; }
+#invoicePaper.tmpl-2 .bill-biz-addr { font-size: 10px; color: #666; }
+#invoicePaper.tmpl-2 .bill-biz-right { font-size: 10px; color: #444; }
+#invoicePaper.tmpl-2 .bill-line-thick { background: #111; height: 1.5px; }
+#invoicePaper.tmpl-2 .bill-line { background: #ccc; height: 1px; }
+#invoicePaper.tmpl-2 .bill-doc-type {
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+#invoicePaper.tmpl-2 .bill-items-table {
+  font-size: 10px;
+}
+#invoicePaper.tmpl-2 .bill-items-table th {
+  background: #f5f5f5;
+  color: #222;
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #111;
+  padding: 4px 4px;
+  font-size: 10px;
+}
+#invoicePaper.tmpl-2 .bill-items-table td {
+  padding: 4px 4px;
+  font-size: 10px;
+  border-bottom: 1px dashed #ddd;
+  color: #222;
+}
+#invoicePaper.tmpl-2 .grand-row td {
+  background: #f0f0f0;
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #111;
+  font-size: 12px;
+}
+#invoicePaper.tmpl-2 .bill-thankyou {
+  border-top: 1px dashed #bbb;
+  font-size: 10px;
+  color: #666;
+}
+#invoicePaper.tmpl-2 .bill-footer-grid { grid-template-columns: 1fr 220px; }
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 3 — BOLD BLACK VYAPAR (Dark solid header)
+   Based on middle-left bold invoice in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-3 .bill-religious {
+  background: #111;
+  color: #ddd;
+  font-size: 10px;
+  padding: 4px 12px;
+  margin-bottom: 0;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-3 .bill-header-block {
+  background: #111;
+  padding: 10px 0 12px;
+}
+#invoicePaper.tmpl-3 .bill-biz-name {
+  font-size: 26px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1px;
+}
+#invoicePaper.tmpl-3 .bill-biz-sub  { color: rgba(255,255,255,0.7); font-size: 11px; }
+#invoicePaper.tmpl-3 .bill-biz-addr { color: rgba(255,255,255,0.55); font-size: 11px; }
+#invoicePaper.tmpl-3 .bill-biz-right { color: rgba(255,255,255,0.8); font-size: 11px; }
+#invoicePaper.tmpl-3 .bill-line-thick {
+  background: #111;
+  height: 4px;
+  margin: 0 0 6px;
+}
+#invoicePaper.tmpl-3 .bill-line { background: #555; height: 1px; }
+#invoicePaper.tmpl-3 .bill-doc-type {
+  color: #111;
+  letter-spacing: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-3 .bill-items-table th {
+  background: #f0f0f0;
+  color: #111;
+  border-top: 2px solid #111;
+  border-bottom: 2px solid #111;
+}
+#invoicePaper.tmpl-3 .bill-items-table td { color: #222; }
+#invoicePaper.tmpl-3 .grand-row td {
+  background: #111;
+  color: #fff;
+  border-top: 2px solid #111;
+  border-bottom: 2px solid #111;
+}
+#invoicePaper.tmpl-3 .bill-thankyou {
+  border-top: 2px solid #111;
+  color: #333;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 4 — SERVICE INCOME (Cursive elegant)
+   Based on middle-center cursive invoice in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-4 {
+  background: #fff;
+}
+#invoicePaper.tmpl-4 .bill-religious {
+  text-align: center;
+  font-style: italic;
+  color: #5a4a3a;
+  font-size: 12px;
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+#invoicePaper.tmpl-4 .bill-header-block {
+  border-bottom: none;
+  padding: 0 0 4px;
+}
+#invoicePaper.tmpl-4 .bill-biz-name {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+#invoicePaper.tmpl-4 .bill-biz-sub  {
+  font-style: italic;
+  color: #666;
+  font-family: Georgia, serif;
+  font-size: 12px;
+}
+#invoicePaper.tmpl-4 .bill-biz-addr { color: #888; font-size: 11px; }
+#invoicePaper.tmpl-4 .bill-biz-right { color: #555; font-size: 11px; }
+#invoicePaper.tmpl-4 .bill-line-thick {
+  height: 1px;
+  background: #333;
+  margin: 8px 0 2px;
+  position: relative;
+}
+#invoicePaper.tmpl-4 .bill-line {
+  height: 1px;
+  background: #aaa;
+}
+#invoicePaper.tmpl-4 .bill-doc-type {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #333;
+  letter-spacing: 1px;
+  font-weight: 400;
+}
+#invoicePaper.tmpl-4 .bill-items-table th {
+  background: #f7f7f7;
+  color: #222;
+  border-top: 1.5px solid #333;
+  border-bottom: 1.5px solid #333;
+  font-family: Georgia, serif;
+  font-size: 11px;
+}
+#invoicePaper.tmpl-4 .bill-items-table td {
+  color: #333;
+  border-bottom: 1px dashed #ccc;
+}
+#invoicePaper.tmpl-4 .grand-row td {
+  background: #f0f0f0;
+  color: #111;
+  border-top: 1.5px solid #333;
+  border-bottom: 1.5px solid #333;
+  font-family: Georgia, serif;
+}
+#invoicePaper.tmpl-4 .bill-thankyou {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #888;
+  border-top: 1px solid #bbb;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 5 — CREDIT NOTE (Red accent border)
+   Based on middle-right VYAPAR Credit Note in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-5 {
+  background: #fff;
+  border: 1.5px solid #c0392b;
+}
+#invoicePaper.tmpl-5 .bill-religious {
+  background: #c0392b;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 12px;
+  margin-bottom: 0;
+  letter-spacing: 1px;
+}
+#invoicePaper.tmpl-5 .bill-header-block {
+  padding: 10px 0 8px;
+}
+#invoicePaper.tmpl-5 .bill-biz-name {
+  font-size: 24px;
+  font-weight: 900;
+  color: #111;
+  letter-spacing: 0.5px;
+}
+#invoicePaper.tmpl-5 .bill-biz-sub  { color: #555; font-size: 11px; }
+#invoicePaper.tmpl-5 .bill-biz-addr { color: #777; font-size: 11px; }
+#invoicePaper.tmpl-5 .bill-biz-right { color: #444; font-size: 11px; }
+#invoicePaper.tmpl-5 .bill-line-thick {
+  background: #c0392b;
+  height: 3px;
+  margin: 4px 0 2px;
+}
+#invoicePaper.tmpl-5 .bill-line { background: #e57373; height: 1px; }
+#invoicePaper.tmpl-5 .bill-doc-type {
+  color: #c0392b;
+  letter-spacing: 2.5px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-5 .bill-items-table th {
+  background: #ffeaea;
+  color: #c0392b;
+  border-top: 2px solid #c0392b;
+  border-bottom: 2px solid #c0392b;
+}
+#invoicePaper.tmpl-5 .bill-items-table td {
+  color: #222;
+  border-bottom: 1px solid #f5c6c6;
+}
+#invoicePaper.tmpl-5 .grand-row td {
+  background: #ffeaea;
+  color: #c0392b;
+  border-top: 2px solid #c0392b;
+  border-bottom: 2px solid #c0392b;
+}
+#invoicePaper.tmpl-5 .bill-thankyou {
+  border-top: 1px dashed #e57373;
+  color: #c0392b;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 6 — WHOLESALE A4/2 (Blue bold, compact)
+   Based on bottom-right small "A4/2 Wholesale Receipt"
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-6 {
+  background: #fff;
+  border: 1.5px solid #1a56db;
+}
+#invoicePaper.tmpl-6 .bill-religious {
+  background: #1a56db;
+  color: #fff;
+  font-size: 9px;
+  padding: 3px 12px;
+  margin-bottom: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+}
+#invoicePaper.tmpl-6 .bill-header-block {
+  padding: 8px 0 6px;
+  border-bottom: 3px solid #1a56db;
+}
+#invoicePaper.tmpl-6 .bill-biz-name {
+  font-size: 28px;
+  font-weight: 900;
+  color: #1a56db;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-6 .bill-biz-sub  { color: #555; font-size: 11px; }
+#invoicePaper.tmpl-6 .bill-biz-addr { color: #777; font-size: 11px; }
+#invoicePaper.tmpl-6 .bill-biz-right { color: #333; font-size: 11px; }
+#invoicePaper.tmpl-6 .bill-line-thick {
+  background: #1a56db;
+  height: 3px;
+  margin: 4px 0 2px;
+}
+#invoicePaper.tmpl-6 .bill-line { background: #93c5fd; height: 1.5px; }
+#invoicePaper.tmpl-6 .bill-doc-type {
+  color: #1a56db;
+  letter-spacing: 2px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-6 .bill-items-table th {
+  background: #dbeafe;
+  color: #1a56db;
+  border-top: 2px solid #1a56db;
+  border-bottom: 2px solid #1a56db;
+  font-size: 11px;
+}
+#invoicePaper.tmpl-6 .bill-items-table td {
+  color: #1e3a8a;
+  border-bottom: 1px solid #bfdbfe;
+  font-size: 12px;
+}
+#invoicePaper.tmpl-6 .grand-row td {
+  background: #1a56db;
+  color: #fff;
+  border-top: 2px solid #1a56db;
+  border-bottom: 2px solid #1a56db;
+}
+#invoicePaper.tmpl-6 .bill-thankyou {
+  border-top: 2px solid #1a56db;
+  color: #1a56db;
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 7 — GREY LEDGER (Side fields, clean grey)
+   Based on bottom-left grey VYAPAR invoice in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-7 {
+  background: #fafafa;
+  border: 1px solid #bbb;
+}
+#invoicePaper.tmpl-7 .bill-religious {
+  background: #9e9e9e;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 12px;
+  margin-bottom: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+}
+#invoicePaper.tmpl-7 .bill-header-block {
+  background: #eeeeee;
+  padding: 10px 0 10px;
+  border-bottom: 2px solid #777;
+}
+#invoicePaper.tmpl-7 .bill-biz-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #222;
+  letter-spacing: 0.5px;
+}
+#invoicePaper.tmpl-7 .bill-biz-sub  { color: #555; font-size: 11px; }
+#invoicePaper.tmpl-7 .bill-biz-addr { color: #777; font-size: 11px; }
+#invoicePaper.tmpl-7 .bill-biz-right { color: #444; font-size: 11px; }
+#invoicePaper.tmpl-7 .bill-line-thick {
+  background: #777;
+  height: 2px;
+  margin: 4px 0 2px;
+}
+#invoicePaper.tmpl-7 .bill-line { background: #aaa; height: 1px; }
+#invoicePaper.tmpl-7 .bill-doc-type {
+  color: #555;
+  letter-spacing: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-7 .bill-items-table th {
+  background: #ddd;
+  color: #111;
+  border-top: 2px solid #777;
+  border-bottom: 2px solid #777;
+  font-size: 11px;
+}
+#invoicePaper.tmpl-7 .bill-items-table td {
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+#invoicePaper.tmpl-7 .bill-items-table tr:nth-child(even) td { background: #f5f5f5; }
+#invoicePaper.tmpl-7 .grand-row td {
+  background: #757575;
+  color: #fff;
+  border-top: 2px solid #555;
+  border-bottom: 2px solid #555;
+}
+#invoicePaper.tmpl-7 .bill-thankyou {
+  border-top: 1px dashed #aaa;
+  color: #666;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 8 — VINTAGE ORDER (Old paper / beige)
+   Based on bottom-center vintage order form in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-8 {
+  background: #fdf8ec;
+  border: 1px solid #c9b99a;
+}
+#invoicePaper.tmpl-8 .bill-religious {
+  color: #7a5c2e;
+  font-style: italic;
+  font-family: Georgia, serif;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+#invoicePaper.tmpl-8 .bill-header-block {
+  border-bottom: 2px solid #8b6914;
+  padding: 4px 0 10px;
+}
+#invoicePaper.tmpl-8 .bill-biz-name {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #3d2b1f;
+  letter-spacing: 0.5px;
+}
+#invoicePaper.tmpl-8 .bill-biz-sub  { color: #7a5c2e; font-style: italic; font-size: 11px; font-family: Georgia, serif; }
+#invoicePaper.tmpl-8 .bill-biz-addr { color: #9a8a70; font-size: 11px; }
+#invoicePaper.tmpl-8 .bill-biz-right { color: #6b5a40; font-size: 11px; }
+#invoicePaper.tmpl-8 .bill-line-thick {
+  background: #8b6914;
+  height: 2px;
+  margin: 5px 0 3px;
+}
+#invoicePaper.tmpl-8 .bill-line { background: #c9b99a; height: 1px; }
+#invoicePaper.tmpl-8 .bill-doc-type {
+  color: #7a5c2e;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-weight: 400;
+}
+#invoicePaper.tmpl-8 .bill-meta-grid { font-family: Georgia, serif; }
+#invoicePaper.tmpl-8 .bill-items-table th {
+  background: #f5e6c8;
+  color: #3d2b1f;
+  border-top: 2px solid #8b6914;
+  border-bottom: 2px solid #8b6914;
+  font-family: Georgia, serif;
+  font-size: 11px;
+}
+#invoicePaper.tmpl-8 .bill-items-table td {
+  color: #3d2b1f;
+  border-bottom: 1px solid #d4c5a9;
+  font-size: 12px;
+}
+#invoicePaper.tmpl-8 .grand-row td {
+  background: #f5e6c8;
+  color: #3d2b1f;
+  border-top: 2px double #8b6914;
+  border-bottom: 2px double #8b6914;
+  font-family: Georgia, serif;
+}
+#invoicePaper.tmpl-8 .bill-thankyou {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #8b6914;
+  border-top: 1px dashed #c9b99a;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLATE 9 — BOLD BLUE VYAPAR (Strong blue, modern)
+   Based on bottom-right bold blue invoice in image
+═══════════════════════════════════════════════════════ */
+#invoicePaper.tmpl-9 {
+  background: #fff;
+  border: 2px solid #1a56db;
+}
+#invoicePaper.tmpl-9 .bill-religious {
+  background: #1a56db;
+  color: #e0eaff;
+  font-size: 10px;
+  padding: 5px 14px;
+  margin-bottom: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+}
+#invoicePaper.tmpl-9 .bill-header-block {
+  background: #1a56db;
+  padding: 14px 0 12px;
+}
+#invoicePaper.tmpl-9 .bill-biz-name {
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-9 .bill-biz-sub  { color: rgba(255,255,255,0.8); font-size: 12px; }
+#invoicePaper.tmpl-9 .bill-biz-addr { color: rgba(255,255,255,0.65); font-size: 11px; }
+#invoicePaper.tmpl-9 .bill-biz-right { color: rgba(255,255,255,0.85); font-size: 11px; }
+#invoicePaper.tmpl-9 .bill-line-thick {
+  background: #1340a0;
+  height: 4px;
+  margin: 0 0 6px;
+}
+#invoicePaper.tmpl-9 .bill-line { background: #93c5fd; height: 1.5px; }
+#invoicePaper.tmpl-9 .bill-doc-type {
+  color: #1a56db;
+  letter-spacing: 3px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+#invoicePaper.tmpl-9 .bill-items-table th {
+  background: #1a56db;
+  color: #fff;
+  border-top: none;
+  border-bottom: none;
+  font-size: 11px;
+  padding: 8px 5px;
+}
+#invoicePaper.tmpl-9 .bill-items-table td {
+  color: #1e3a8a;
+  border-bottom: 1px solid #bfdbfe;
+  font-size: 12px;
+}
+#invoicePaper.tmpl-9 .grand-row td {
+  background: #1340a0;
+  color: #fff;
+  border-top: 3px solid #1340a0;
+  border-bottom: 3px solid #1340a0;
+  font-size: 15px;
+}
+#invoicePaper.tmpl-9 .bill-thankyou {
+  border-top: 2px solid #1a56db;
+  color: #1a56db;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ── Print fixes for colored-header templates ── */
+@media print {
+  #invoicePaper.tmpl-3 .bill-header-block,
+  #invoicePaper.tmpl-6 .bill-header-block,
+  #invoicePaper.tmpl-9 .bill-header-block { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ── Bill Card Status and Delete Action Styling ── */
+.hbc-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+.btn-status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+.btn-status.paid {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+.btn-status.paid:hover {
+  background: #bbf7d0;
+}
+.btn-status.unpaid {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+.btn-status.unpaid:hover {
+  background: #fca5a5;
+}
+.btn-delete-bill {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-delete-bill:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
