@@ -14,12 +14,49 @@
       padding: 30px 40px 60px;
       overflow-y: auto;
       flex: 1;
-      max-width: 750px;
+      max-width: 800px;
       width: 100%;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
+    }
+
+    .section-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+      padding: 28px 32px;
+    }
+    .section-card:hover {
+      border-color: rgba(0, 245, 212, 0.15);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    }
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+    .help-text {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .profile-main {
+        padding: 20px 16px 40px;
+        gap: 20px;
+      }
+      .section-card {
+        padding: 20px 24px;
+      }
     }
   </style>
 </head>
