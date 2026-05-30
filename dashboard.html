@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Bill Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    /* Local dashboard specific customizations */
+    .dashboard-main {
+      padding: 30px 40px 60px;
+      overflow-y: auto;
+      flex: 1;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Stats Grid */
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    /* Profile Glass Card */
+    .profile-banner {
+      background: linear-gradient(135deg, rgba(22, 32, 59, 0.7) 0%, rgba(13, 20, 38, 0.9) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px 30px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+    }
+    .profile-banner::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 130px; height: 130px;
+      background: var(--accent-mint-glow);
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+    }
+    .profile-banner-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-mint);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .profile-banner-avatar-placeholder {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent-mint-glow);
+      border: 2px solid rgba(0, 245, 212, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: var(--accent-mint);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .profile-banner-details {
+      flex: 1;
+    }
+    .profile-banner-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+    .profile-banner-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .profile-banner-badge {
+      display: inline-flex;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    /* Search Bar Wrapper */
+    .search-container {
+      position: relative;
+    }
+    .search-container input {
+      width: 100%;
+      padding-left: 44px;
+    }
+    .search-icon-badge {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* History Outer Layout */
+    .history-card-wrap {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .history-card-header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .history-card-header-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .btn-refresh {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      height: 34px;
+      font-size: 12px;
+      border-radius: var(--radius-sm);
+    }
+    .btn-refresh:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-white);
+    }
+
+    /* Unique stat boxes inside profile card */
+    .stats-card-group {
+      display: flex;
+      gap: 16px;
+    }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      text-align: center;
+      flex: 1;
+    }
+    .stat-pill-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent-mint);
+      line-height: 1;
+    }
+    .stat-pill-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-main {
+        padding: 20px 16px 40px;
+        gap: 18px;
+      }
+      .dashboard-stats {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .profile-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+      }
+      .stats-card-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Auth loading overlay -->
+  <div id="authOverlay">
+    <div style="font-size:48px">📄</div>
+    <div style="font-size:18px;font-weight:700;color:#00f5d4">Bill Maker</div>
+    <div class="spinner"></div>
+    <div style="font-size:13px;color:#6b7280">लोगिन जाँच हो रही है...</div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== PERSISTENT LEFT SIDEBAR ===== -->
+    <aside class="sidebar-nav" id="sidebarNav">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">📄</div>
+        <div class="sidebar-brand-text">
+          <span class="sidebar-brand-name">Bill Maker</span>
+          <span class="sidebar-brand-sub">SaaS Workspace</span>
+        </div>
+      </div>
+      
+      <ul class="sidebar-menu">
+        <li>
+          <a href="index.html" class="sidebar-menu-link">
+            <span>📋</span> Workspace
+          </a>
+        </li>
+        <li>
+          <a href="dashboard.html" class="sidebar-menu-link active">
+            <span>📁</span> Saved Bills
+          </a>
+        </li>
+        <li>
+          <a href="profile.html" class="sidebar-menu-link">
+            <span>⚙️</span> Profile Settings
+          </a>
+        </li>
+        <li id="adminSidebarLink" style="display:none">
+          <a href="admin.html" class="sidebar-menu-link" style="color:var(--accent-mint)">
+            <span>👑</span> Admin Panel
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user" id="userInfo" style="display:none">
+          <div class="sidebar-user-avatar" id="userAvatarPlaceholder">👤</div>
+          <img class="sidebar-user-avatar" id="userAvatar" src="" alt="" style="display:none">
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name" id="userName">—</div>
+            <div class="sidebar-user-email" id="userEmail">—</div>
+          </div>
+        </div>
+        <button class="sidebar-btn-logout" id="btnLogout" style="display:none">
+          🚪 Logout / लॉगआउट
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN DISPLAY AREA ===== -->
+    <div class="main-viewport">
+      <!-- Mobile Top bar -->
+      <div class="mobile-top-bar">
+        <button class="mobile-hamburger" id="mobileHamburger">☰</button>
+        <span class="mobile-brand-title">📄 Bill Maker</span>
+        <button class="btn-new" onclick="goNewBill()" style="height:36px; padding:0 12px; font-size:12px;">➕ New</button>
+      </div>
+
+      <!-- Desktop Local Header -->
+      <header class="workspace-header">
+        <div class="workspace-title">
+          <h2>📁 सहेजे गए बिल <span class="badge">Dashboard</span></h2>
+        </div>
+        <div class="workspace-actions">
+          <button class="btn-print" onclick="goNewBill()">➕ New Bill / नया बिल</button>
+        </div>
+      </header>
+
+      <!-- Scrollable Main Content -->
+      <main class="dashboard-main">
+
+        <!-- User Stats Block -->
+        <div class="dashboard-stats" id="profileCard" style="display:none">
+          <!-- Profile Card banner -->
+          <div class="profile-banner">
+            <div class="profile-banner-avatar-placeholder" id="profileAvatarPlaceholder">👤</div>
+            <img id="profileAvatar" class="profile-banner-avatar" src="" alt="" style="display:none;">
+            <div class="profile-banner-details">
+              <div class="profile-banner-name" id="profileName">—</div>
+              <div class="profile-banner-email" id="profileEmail">—</div>
+              <div class="profile-banner-badge" id="profileBadge">✅ सुरक्षित लोकल अकाउंट (Local Account)</div>
+            </div>
+          </div>
+          
+          <!-- Stat values pills -->
+          <div class="stats-card-group">
+            <div class="stat-pill">
+              <div class="stat-pill-val" id="statTotal">0</div>
+              <div class="stat-pill-lbl">कुल बिल (Total Bills)</div>
+            </div>
+            <div class="stat-pill">
+              <div class="stat-pill-val" id="statShops">0</div>
+              <div class="stat-pill-lbl">कुल ग्राहक (Total Clients)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search input box -->
+        <div class="search-container">
+          <span class="search-icon-badge">🔍</span>
+          <input type="text" id="searchInput" placeholder="ग्राहक का नाम, पता या बिल नंबर डालें...">
+        </div>
+
+        <!-- Bill Directory Card -->
+        <div class="history-card-wrap">
+          <div class="history-card-header">
+            <span class="history-card-header-title">📋 बिल रिकॉर्ड (Bill Logs)</span>
+            <button class="btn-refresh" id="btnRefresh">🔄 Refresh</button>
+          </div>
+          <!-- Bill log list container -->
+          <div id="historyList">
+            <div class="spinner-ring" style="width:32px; height:32px; border:3px solid rgba(255,255,255,0.05); border-top-color:var(--accent-mint); border-radius:50%; animation:spin 0.8s linear infinite; margin:40px auto;"></div>
+          </div>
+        </div>
+
+      </main><!-- end dashboard-main -->
+    </div><!-- end main-viewport -->
+  </div><!-- end app-container -->
+
+  <!-- Toast widget -->
+  <div id="editorToast"></div>
+
+  <script>
+    let CURRENT_USER = null;
+    let ALL_BILLS = [];
+
+    // Helper utilities
+    function el(id) { return document.getElementById(id); }
+
+    // ── Local Auth Guard ──
+    (function initAuth() {
+      const activeSession = localStorage.getItem('bm_current_session');
+      if (!activeSession) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        CURRENT_USER = JSON.parse(activeSession);
+        if (!CURRENT_USER || CURRENT_USER.role !== 'user') {
+          throw new Error('Invalid user session');
+        }
+      } catch (err) {
+        console.warn('Auth session validation error:', err);
+        localStorage.removeItem('bm_current_session');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Enforce subscription state checks
+      try {
+        const usersData = localStorage.getItem('bm_local_users');
+        if (usersData) {
+          const users = JSON.parse(usersData);
+          if (Array.isArray(users)) {
+            const u = users.find(usr => (usr.email || usr.userId || '').toLowerCase() === CURRENT_USER.email.toLowerCase());
+            if (u && u.subscriptionState && u.subscriptionState !== 'active') {
+              alert('❌ आपका खाता निलंबित (Suspended) या समाप्त हो चुका है। कृपया एडमिन से संपर्क करें।');
+              localStorage.removeItem('bm_current_session');
+              window.location.href = 'login.html';
+              return;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Subscription guard verification error:', err);
+      }
+      
+      // Hide auth overlay
+      const overlay = el('authOverlay');
+      if (overlay) overlay.style.display = 'none';
+
+      // Load details and records
+      showUserInfo(CURRENT_USER);
+      loadHistory();
+      wireMobileSidebar();
+    })();
+
+    // ── Hamburger Sidebar Toggle ──
+    function wireMobileSidebar() {
+      const hamburger = el('mobileHamburger');
+      const sidebar = el('sidebarNav');
+      const overlay = el('sidebarOverlay');
+      
+      if (hamburger && sidebar && overlay) {
+        hamburger.addEventListener('click', () => {
+          sidebar.classList.add('active');
+          overlay.classList.add('active');
+        });
+        
+        overlay.addEventListener('click', () => {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+        });
+
+        sidebar.querySelectorAll('.sidebar-menu-link').forEach(link => {
+          link.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+          });
+        });
+      }
+    }
+
+    // ── User Profiler ──
+    function showUserInfo(user) {
+      // Sidebar footer profiler
+      const nameEl = el('userName');
+      const emailEl = el('userEmail');
+      const userInfoBox = el('userInfo');
+      const logoutEl = el('btnLogout');
+      const adminLink = el('adminSidebarLink');
+
+      if (nameEl) nameEl.textContent = user.shopName || 'यूज़र';
+      if (emailEl) emailEl.textContent = user.email || '';
+      if (userInfoBox) userInfoBox.style.display = 'flex';
+      if (logoutEl) {
+        logoutEl.style.display = 'inline-flex';
+        logoutEl.addEventListener('click', () => {
+          if (confirm('Logout करना चाहते हैं?')) {
+            localStorage.removeItem('bm_current_session');
+            window.location.href = 'login.html';
+          }
+        });
+      }
+      if (adminLink) {
+        adminLink.style.display = (user && user.role === 'admin') ? 'block' : 'none';
+      }
+
+      // Display user avatar initials
+      const initials = (user.shopName || 'U').charAt(0).toUpperCase();
+      const navPlaceholder = el('profileAvatarPlaceholder');
+      const navAvatar = el('profileAvatar');
+      if (user.picture) {
+        if (navAvatar) {
+          navAvatar.src = user.picture;
+          navAvatar.style.display = 'block';
+        }
+        if (navPlaceholder) navPlaceholder.style.display = 'none';
+      } else {
+        if (navPlaceholder) navPlaceholder.textContent = initials;
+      }
+
+      // Stats profile banner details
+      el('profileCard').style.display = 'grid';
+      el('profileName').textContent = user.shopName || 'यूज़र';
+      el('profileEmail').textContent = user.email || '';
+      
+      const badge = el('profileBadge');
+      if (badge) {
+        if (user.authProvider === 'google') {
+          badge.textContent = '✅ Google Verified Account';
+        } else {
+          badge.textContent = '✅ Secure Local Account';
+        }
+      }
+    }
+
+    // ── Load saved logs ──
+    function loadHistory(q = '') {
+      const listEl = el('historyList');
+      listEl.innerHTML = '<div class="spinner-ring" style="width:32px; height:32px; border:3px solid rgba(255,255,255,0.05); border-top-color:var(--accent-mint); border-radius:50%; animation:spin 0.8s linear infinite; margin:40px auto;"></div>';
+
+      try {
+        const storageKey = 'bm_bills_' + CURRENT_USER.email;
+        const data = localStorage.getItem(storageKey);
+        ALL_BILLS = data ? JSON.parse(data) : [];
+
+        renderBills(q);
+      } catch(err) {
+        console.error(err);
+        listEl.innerHTML = `<div style="text-align:center;padding:40px;color:var(--accent-danger)">
+          ❌ Load error. Browser data check required.
+        </div>`;
+      }
+    }
+
+    function showToast(msg, duration = 3000) {
+      const t = el('editorToast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), duration);
+    }
+
+    function toggleBillPaidStatus(billId, currentStatus) {
+      if (!CURRENT_USER) return;
+      try {
+        const storageKey = 'bm_bills_' + CURRENT_USER.email;
+        const idx = ALL_BILLS.findIndex(b => b.id === billId);
+        if (idx !== -1) {
+          ALL_BILLS[idx].paid = !currentStatus;
+          localStorage.setItem(storageKey, JSON.stringify(ALL_BILLS));
+          
+          const q = el('searchInput')?.value || '';
+          renderBills(q);
+          showToast(ALL_BILLS[idx].paid ? '✅ Bill marked as PAID' : '⏳ Bill marked as UNPAID');
+        }
+      } catch (err) {
+        console.error('Error updating paid status:', err);
+      }
+    }
+
+    function deleteBillRecord(billId, invoiceNo) {
+      if (!CURRENT_USER) return;
+      if (!confirm(`क्या आप सच में बिल नं ${invoiceNo} को हटाना चाहते हैं?`)) return;
+
+      try {
+        const storageKey = 'bm_bills_' + CURRENT_USER.email;
+        ALL_BILLS = ALL_BILLS.filter(b => b.id !== billId);
+        localStorage.setItem(storageKey, JSON.stringify(ALL_BILLS));
+        
+        // Sync central user stats if available
+        try {
+          const usersData = localStorage.getItem('bm_local_users');
+          if (usersData) {
+            let users = JSON.parse(usersData);
+            let uIdx = users.findIndex(u => (u.email || u.userId || '').toLowerCase() === CURRENT_USER.email.toLowerCase());
+            if (uIdx !== -1) {
+              if (!users[uIdx].stats) {
+                users[uIdx].stats = { lastLogin: null, lastActive: null, sessionCount: 0, totalBills: 0 };
+              }
+              users[uIdx].stats.totalBills = ALL_BILLS.length;
+              localStorage.setItem('bm_local_users', JSON.stringify(users));
+            }
+          }
+        } catch (syncErr) {
+          console.warn('Central stats sync warning on delete:', syncErr);
+        }
+        
+        const q = el('searchInput')?.value || '';
+        renderBills(q);
+        showToast('🗑️ बिल सफलतापूर्वक हटा दिया गया है।');
+      } catch (err) {
+        console.error('Error deleting bill:', err);
+        showToast('❌ बिल हटाने में त्रुटि आई।');
+      }
+    }
+
+    // ── Render grouped logs ──
+    function renderBills(q = '') {
+      const listEl = el('historyList');
+      let bills = ALL_BILLS;
+
+      if (q.trim()) {
+        const lq = q.toLowerCase();
+        bills = bills.filter(b =>
+          (b.receiverName || '').toLowerCase().includes(lq) ||
+          String(b.invoiceNo || '').toLowerCase().includes(lq) ||
+          (b.receiverAddress || '').toLowerCase().includes(lq)
+        );
+      }
+
+      // Update calculations
+      const uniqueShops = new Set(ALL_BILLS.map(b => (b.receiverName || '').trim())).size;
+      el('statTotal').textContent = ALL_BILLS.length;
+      el('statShops').textContent = uniqueShops;
+
+      if (bills.length === 0) {
+        listEl.innerHTML = `
+          <div class="history-empty">
+            <div class="icon">${q ? '🔍' : '📂'}</div>
+            <div style="font-weight:700;margin-bottom:6px;color:var(--text-white)">${q ? 'कोई रिकॉर्ड नहीं मिला' : 'कोई बिल सेव नहीं हुआ'}</div>
+            <div style="font-size:12px">${q ? 'कृपया कुछ और खोजें' : 'प्रिंट करने पर बिल यहाँ सेव होंगे'}</div>
+          </div>`;
+        return;
+      }
+
+      // Group records by buyer client
+      const groups = {};
+      bills.forEach(b => {
+        const key = (b.receiverName || 'अज्ञात ग्राहक').trim();
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(b);
+      });
+
+      listEl.innerHTML = '';
+      Object.entries(groups).forEach(([shop, shopBills]) => {
+        const hdr = document.createElement('div');
+        hdr.className = 'history-group-header';
+        hdr.textContent = `🏢 ${shop} (${shopBills.length} बिल)`;
+        listEl.appendChild(hdr);
+
+        shopBills.forEach(bill => {
+          const card = document.createElement('div');
+          card.className = 'history-bill-card';
+          const isChallan = bill.billType === 'challan';
+          const dateStr = bill.date ? bill.date.split('-').reverse().join('/') : '—';
+          const net = bill.totals?.net || 0;
+          const isPaid = !!bill.paid;
+
+          card.innerHTML = `
+            <div class="hbc-icon">${isChallan ? '🚚' : '🧾'}</div>
+            <div class="hbc-info">
+              <div class="hbc-shop">${esc(bill.receiverName) || '—'}</div>
+              <div class="hbc-meta">
+                बिल नं: <strong>${esc(bill.invoiceNo)}</strong>
+                &nbsp;·&nbsp; ${bill.items?.length || 0} items
+                &nbsp;·&nbsp; ${isChallan ? 'चालान (Challan)' : 'अनुमानित (Estimate)'}
+              </div>
+            </div>
+            <div class="hbc-amount">
+              <div class="hbc-amt-val">₹ ${Number(net).toLocaleString('en-IN')}</div>
+              <div class="hbc-date">${dateStr}</div>
+            </div>
+            <div class="hbc-actions">
+              <button class="btn-status ${isPaid ? 'paid' : 'unpaid'}" title="स्थिति बदलें">
+                ${isPaid ? 'Paid' : 'Unpaid'}
+              </button>
+              <button class="btn-delete-bill" title="बिल हटाएं">🗑️</button>
+            </div>
+          `;
+
+          // Button click stop propagation triggers
+          const btnStatus = card.querySelector('.btn-status');
+          if (btnStatus) {
+            btnStatus.addEventListener('click', (e) => {
+              e.stopPropagation();
+              toggleBillPaidStatus(bill.id, isPaid);
+            });
+          }
+
+          const btnDelete = card.querySelector('.btn-delete-bill');
+          if (btnDelete) {
+            btnDelete.addEventListener('click', (e) => {
+              e.stopPropagation();
+              deleteBillRecord(bill.id, bill.invoiceNo);
+            });
+          }
+
+          // Open record bridge
+          card.addEventListener('click', () => openBillInEditor(bill));
+          listEl.appendChild(card);
+        });
+      });
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function openBillInEditor(bill) {
+      sessionStorage.setItem('bm_load_bill', JSON.stringify(bill));
+      window.location.href = 'index.html';
+    }
+
+    function goNewBill() {
+      sessionStorage.removeItem('bm_load_bill');
+      window.location.href = 'index.html';
+    }
+
+    // Search events
+    let searchTimeout;
+    el('searchInput').addEventListener('input', e => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => renderBills(e.target.value), 300);
+    });
+
+    el('btnRefresh').addEventListener('click', () => {
+      loadHistory(el('searchInput').value);
+    });
+  </script>
+</body>
+</html>

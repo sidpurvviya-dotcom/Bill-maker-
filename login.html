@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Sign Up — Bill Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #060913;
+      --bg-card: rgba(22, 32, 59, 0.55);
+      --bg-input: rgba(255, 255, 255, 0.03);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-mint: #00f5d4;
+      --accent-mint-glow: rgba(0, 245, 212, 0.15);
+      --glow-mint: 0 0 20px var(--accent-mint-glow);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(0, 245, 212, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 30%, rgba(0,245,212,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 70%, rgba(59,130,246,0.06) 0%, transparent 50%);
+      animation: blobMove 12s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes blobMove {
+      0%   { transform: translate(0,0) rotate(0deg); }
+      100% { transform: translate(40px, 30px) rotate(8deg); }
+    }
+
+    /* ── Login Glass Card ── */
+    .login-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      position: relative;
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+    }
+    
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, var(--accent-mint));
+      border-radius: 20px 20px 0 0;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Branding ── */
+    .app-icon {
+      width: 68px;
+      height: 68px;
+      background: linear-gradient(135deg, #1d4ed8, var(--accent-mint));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 24px rgba(29, 78, 216, 0.4);
+    }
+
+    .app-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .app-tagline {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+
+    /* ── Forms ── */
+    .auth-form {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .field-group input {
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0 16px;
+      height: 48px; /* Touch optimized */
+      font-size: 14px;
+      font-family: inherit;
+      color: #fff;
+      background: var(--bg-input);
+      outline: none;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+    .field-group input:focus {
+      border-color: var(--accent-mint);
+      box-shadow: var(--glow-mint);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1d4ed8, var(--accent-mint));
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--bg-base);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0, 245, 212, 0.25);
+      margin-top: 8px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 0 8px 24px rgba(0, 245, 212, 0.4);
+      filter: brightness(1.05);
+    }
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+    .req {
+      color: var(--accent-danger);
+    }
+
+    /* Status Notifications */
+    .status-msg {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .status-msg.error {
+      background: rgba(244, 63, 94, 0.12);
+      color: #ff4d6d;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      display: block;
+    }
+    .status-msg.success {
+      background: rgba(16, 185, 129, 0.12);
+      color: #00f5d4;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      display: block;
+    }
+
+    .info-note {
+      margin-top: 28px;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <!-- App icon branding -->
+    <div class="app-icon">📄</div>
+    <div class="app-name">Bill Maker</div>
+    <div class="app-tagline">बिल / इनवॉइस / चालान बनाएं — आसानी से और तेज़ी से</div>
+
+    <!-- Login credentials Form -->
+    <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+      <div class="field-group">
+        <label>यूज़रनेम / ईमेल (Username / Email) <span class="req">*</span></label>
+        <input type="text" id="loginEmail" placeholder="जैसे: rahul या client@gmail.com" required autocomplete="username">
+      </div>
+      <div class="field-group">
+        <label>पासवर्ड (Password) <span class="req">*</span></label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-submit">लॉगिन करें (Sign In)</button>
+    </form>
+
+    <!-- Display status logs -->
+    <div class="status-msg" id="statusMsg"></div>
+
+    <div class="info-note">
+      🔒 आपका डेटा आपके इसी ब्राउज़र (`localStorage`) में सुरक्षित रूप से सेव किया जाता है।
+    </div>
+  </div>
+
+  <script>
+    // Check if user session already holds active credentials
+    window.addEventListener('DOMContentLoaded', () => {
+      const activeSession = localStorage.getItem('bm_current_session');
+      if (activeSession) {
+        try {
+          const session = JSON.parse(activeSession);
+          if (session && session.role === 'admin') {
+            window.location.href = 'admin.html';
+            return;
+          }
+        } catch (e) {}
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    const statusEl = document.getElementById('statusMsg');
+
+    function showStatus(msg, type = 'error') {
+      statusEl.textContent = msg;
+      statusEl.className = 'status-msg ' + type;
+    }
+
+    function clearStatus() {
+      statusEl.className = 'status-msg';
+      statusEl.style.display = 'none';
+    }
+
+    // ── Database lists helper ──
+    function getLocalUsers() {
+      const data = localStorage.getItem('bm_local_users');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveLocalUsers(users) {
+      localStorage.setItem('bm_local_users', JSON.stringify(users));
+    }
+
+    // SHA-256 fallback algorithm
+    function sha256Fallback(ascii) {
+      function rightRotate(value, amount) {
+        return (value >>> amount) | (value << (32 - amount));
+      }
+      var mathPow = Math.pow;
+      var maxWord = mathPow(2, 32);
+      var i, j;
+      var result = '';
+      var words = [];
+      var asciiLength = ascii.length;
+      var hash = [];
+      var k = [];
+      var primeCounter = 0;
+      var isComposite = {};
+      for (var candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (i = 0; i < 313; i += candidate) {
+            isComposite[i] = candidate;
+          }
+          hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while (ascii.length % 64 - 56) ascii += '\x00';
+      for (i = 0; i < ascii.length; i++) {
+        j = ascii.charCodeAt(i);
+        if (j >> 8) return '';
+        words[i >> 2] |= j << ((3 - i % 4) * 8);
+      }
+      words[words.length] = ((asciiLength / maxWord) | 0);
+      words[words.length] = (asciiLength << 3);
+      for (j = 0; j < words.length; j += 16) {
+        var w = words.slice(j, j + 16);
+        var oldHash = hash;
+        hash = hash.slice(0, 8);
+        for (i = 0; i < 64; i++) {
+          var w15 = w[i - 15], w2 = w[i - 2];
+          var s0 = rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3);
+          var s1 = rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10);
+          w[i] = (i >= 16) ? (w[i - 16] + s0 + w[i - 7] + s1) | 0 : w[i];
+          var ch = (hash[4] & hash[5]) ^ (~hash[4] & hash[6]);
+          var maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+          var temp1 = hash[7] + (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) + ch + k[i] + w[i];
+          var temp2 = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) + maj;
+          hash = [(temp1 + temp2) | 0].concat(hash);
+          hash[4] = (hash[4] + temp1) | 0;
+        }
+        for (i = 0; i < 8; i++) {
+          hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+      }
+      for (i = 0; i < 8; i++) {
+        var v = hash[i];
+        if (v < 0) v += maxWord;
+        var str = v.toString(16);
+        while (str.length < 8) str = '0' + str;
+        result += str;
+      }
+      return result;
+    }
+
+    // SHA-256 async hasher
+    async function hashPassword(password) {
+      if (!window.crypto || !window.crypto.subtle) {
+        console.warn('Web Crypto API not available. Using pure JS SHA-256 fallback.');
+        return sha256Fallback(password);
+      }
+      try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (err) {
+        console.warn('SubtleCrypto digest failed, falling back to JS implementation:', err);
+        return sha256Fallback(password);
+      }
+    }
+
+    // Auth Submission Logic
+    async function handleLogin(e) {
+      e.preventDefault();
+      clearStatus();
+
+      try {
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const password = document.getElementById('loginPassword').value;
+
+        const passwordHash = await hashPassword(password);
+
+        // ── Admin verification ──
+        if (email === 'sidpurvviya@gmail.com' && password === 'Siddhant@16') {
+          let adminConfig = localStorage.getItem('bm_admin_config');
+          if (!adminConfig) {
+            const adminObj = {
+              masterId: 'sidpurvviya@gmail.com',
+              masterPasswordHash: passwordHash,
+              adminEmail: 'sidpurvviya@gmail.com',
+              businessName: 'Super Admin Group',
+              gmailClientId: '',
+              gmailClientSecret: '',
+              gmailRefreshToken: '',
+              managedUsers: []
+            };
+            localStorage.setItem('bm_admin_config', JSON.stringify(adminObj));
+          }
+
+          const dummyToken = btoa(JSON.stringify({ email: 'sidpurvviya@gmail.com', role: 'admin', exp: Date.now() + 86400000 }));
+          localStorage.setItem('bm_current_session', JSON.stringify({
+            email: 'sidpurvviya@gmail.com',
+            shopName: 'Super Admin',
+            role: 'admin',
+            token: dummyToken,
+            authProvider: 'local'
+          }));
+
+          showStatus('✅ Admin login successful! Opening control panel...', 'success');
+          setTimeout(() => {
+            window.location.href = 'admin.html';
+          }, 800);
+          return;
+        }
+
+        // ── Normal sub-users verification ──
+        const users = getLocalUsers();
+        let matchedUser = null;
+        let needsMigration = false;
+
+        for (let u of users) {
+          const uId = (u.username || u.userId || u.email || '').toLowerCase();
+          if (uId === email) {
+            if (u.passwordHash) {
+              if (u.passwordHash === passwordHash) {
+                matchedUser = u;
+              }
+            } else if (u.password === password) {
+              matchedUser = u;
+              needsMigration = true;
+            }
+            break;
+          }
+        }
+
+        if (!matchedUser) {
+          showStatus('❌ यूज़रनेम / ईमेल या पासवर्ड सही नहीं है।', 'error');
+          return;
+        }
+
+        if (matchedUser.subscriptionState && matchedUser.subscriptionState !== 'active') {
+          showStatus(`❌ आपका खाता निलंबित (Suspended) या समाप्त हो चुका है। कृपया एडमिन से संपर्क करें।`, 'error');
+          return;
+        }
+
+        if (needsMigration) {
+          matchedUser.passwordHash = passwordHash;
+          delete matchedUser.password;
+        }
+
+        if (!matchedUser.stats) {
+          matchedUser.stats = { lastLogin: null, lastActive: null, sessionCount: 0, totalBills: 0 };
+        }
+        matchedUser.stats.lastLogin = new Date().toISOString();
+        matchedUser.stats.sessionCount = (matchedUser.stats.sessionCount || 0) + 1;
+        
+        if (!matchedUser.billingPreferences) {
+          matchedUser.billingPreferences = {
+            pageSize: 'A4',
+            autoIncrement: true
+          };
+        }
+
+        saveLocalUsers(users);
+
+        const sessionId = matchedUser.username || matchedUser.email || matchedUser.userId;
+        const matchedRole = matchedUser.role || 'user';
+        const userToken = btoa(JSON.stringify({ email: sessionId, role: matchedRole, exp: Date.now() + 86400000 }));
+        localStorage.setItem('bm_current_session', JSON.stringify({
+          email: sessionId,
+          shopName: matchedUser.shopName,
+          role: matchedRole,
+          token: userToken,
+          authProvider: 'local'
+        }));
+
+        showStatus('✅ लॉगिन सफल! डैशबोर्ड खुल रहा है...', 'success');
+
+        setTimeout(() => {
+          window.location.href = matchedRole === 'admin' ? 'admin.html' : 'dashboard.html';
+        }, 800);
+      } catch (err) {
+        console.error(err);
+        showStatus('❌ लॉगिन के दौरान त्रुटि: ' + err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>
